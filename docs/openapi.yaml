@@ -1,0 +1,554 @@
+openapi: 3.0.0
+info:
+  version: 0.1.0
+  title: brewer-hub
+  description: |
+    This API make available information about craft beer
+servers:
+  - url: https://api.punkapi.com/v2
+    description: old backend
+paths:
+  /beers/{beer-id}:
+    get:
+      description: "get information of the beer with id {beer-id}"
+      parameters:
+        - $ref: "#/components/parameters/beer-id"
+      responses:
+        "200":
+          description: |
+            in the body of the response will be a json with the 
+            information about the beer with id "beer-id".
+          headers:
+            x-ratelimit-limit:
+              $ref: "#/components/headers/x-ratelimit-limit"
+            x-ratelimit-limit-remaining:
+              $ref: "#/components/headers/x-ratelimit-limit-remaining"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/beer"
+        "404":
+          $ref: "#/components/responses/not-found"
+        "400":
+          $ref: "#/components/responses/bad-request"
+  /beers/random:
+    get:
+      description: "get information of a random beer"
+      responses:
+        "200":
+          description: |
+            response with a json with the information about a random beer.
+          headers:
+            x-ratelimit-limit:
+              $ref: "#/components/headers/x-ratelimit-limit"
+            x-ratelimit-limit-remaining:
+              $ref: "#/components/headers/x-ratelimit-limit-remaining"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/beer"
+        "404":
+          $ref: "#/components/responses/not-found"
+  /beers:
+    get:
+      description: "return information about all the beers"
+      parameters:
+        - $ref: "#/components/parameters/per_page"
+        - $ref: "#/components/parameters/page"
+        - $ref: "#/components/parameters/abv_gt"
+        - $ref: "#/components/parameters/abv_lt"
+        - $ref: "#/components/parameters/ibu_gt"
+        - $ref: "#/components/parameters/ibu_lt"
+        - $ref: "#/components/parameters/ebc_gt"
+        - $ref: "#/components/parameters/ebc_lt"
+        - $ref: "#/components/parameters/beer_name"
+        - $ref: "#/components/parameters/yeast"
+        - $ref: "#/components/parameters/brewed_before"
+        - $ref: "#/components/parameters/brewed_after"
+        - $ref: "#/components/parameters/hops"
+        - $ref: "#/components/parameters/malt"
+        - $ref: "#/components/parameters/food"
+        - $ref: "#/components/parameters/ids"
+      responses:
+        "200":
+          description: "a list of beers"
+          headers:
+            x-ratelimit-limit:
+              $ref: "#/components/headers/x-ratelimit-limit"
+            x-ratelimit-limit-remaining:
+              $ref: "#/components/headers/x-ratelimit-limit-remaining"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/beers-list"
+        "404":
+          $ref: "#/components/responses/not-found"
+components:
+  schemas:
+    error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      required:
+        - code
+        - message
+    beer:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+          example: 1
+          nullable: false
+        name:
+          type: string
+          maxLength: 100
+          example: "Buzz"
+          nullable: false
+        tagline:
+          type: string
+          maxLength: 255
+          example: "A real Bitter Experience."
+          nullable: true
+        firs_brewed:
+          type: string
+          maxLength: 7
+          minLength: 7
+          pattern: '[0-1][0-9]\/[1-2][0-9]{3}'
+          example: "09/2007"
+          nullable: false
+        description:
+          type: string
+          maxLength: 1000
+          example: |
+            "A light, crisp and bitter IPA brewed with English and American hops. A small batch brewed only once."
+          nullable: true
+        image_url:
+          type: string
+          format: uri
+          maxLength: 1000
+          example: "https://images.punkapi.com/v2/keg.png"
+          nullable: false
+        abv:
+          type: number
+          format: float
+          example: 4.5
+          nullable: false
+        ibu:
+          type: number
+          format: float
+          example: 60
+          nullable: false
+        target_fg:
+          type: number
+          format: float
+          example: 1010
+          nullable: false
+        target_og:
+          type: number
+          format: float
+          example: 1044
+          nullable: false
+        ebc:
+          type: number
+          format: float
+          example: 20
+          nullable: false
+        srm:
+          type: number
+          format: float
+          example: 10
+          nullable: false
+        ph:
+          type: number
+          format: float
+          example: 4.4
+          nullable: false
+        attenuation_level:
+          type: number
+          format: float
+          example: 75
+          nullable: false
+        volume:
+          $ref: "#/components/schemas/volume"
+        boil_volume:
+          $ref: "#/components/schemas/volume"
+        method:
+          $ref: "#/components/schemas/method"
+        ingredients:
+          $ref: "#/components/schemas/ingredients"
+    ingredients:
+      type: object
+      properties:
+        malts:
+          $ref: "#/components/schemas/malt-list"
+        hops:
+          $ref: "#/components/schemas/hop-list"
+        yeast:
+          type: string
+          maxLength: 100
+          example: "Wyeast 1056 - American Ale™"
+    malt-list:
+      type: object
+      properties:
+        malts:
+          type: array
+          items:
+            $ref: "#/components/schemas/malt"
+      example:
+        - name: Maris Otter Extra Pale
+          amount: 
+            value: 3.3
+            unit: "kilograms"
+        - name: Caramalt
+          amount: 
+            value: 0.2
+            unit: "kilograms"
+        - name: Munich
+          amount: 
+            value: 0.4
+            unit: "kilograms"
+    malt:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 50
+          example: "Maris Otter Extra Pale"
+        amount:
+          $ref: "#/components/schemas/amount"
+    hop-list:
+      type: array
+      items:
+        $ref: "#/components/schemas/hop"
+      example:
+        - name: "Fuggles"
+          amount: 
+            value: 25
+            unit: "grams"
+          add: "start"
+          attribute: "Flavour"
+        - name: "Fuggles"
+          amount: 
+            value: 37.5
+            unit: "grams"
+          add: "middle"
+          attribute: "Flavour"
+        - name: "First Gold"
+          amount: 
+            value: 37.5
+            unit: "grams"
+          add: "end"
+          attribute: "Flavour"
+    hop:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 50
+          example: "Fuggles"
+        amount:
+          $ref: "#/components/schemas/amount"
+        add:
+          type: string
+          maxLength: 50
+          example: "start"
+        attribute:
+          type: string
+          enum:
+            - "Twist"
+            - "Bittering"
+            - "Bitter"
+            - "Wood Ageing"
+            - "Aroma"
+            - "Flavour"
+            - "Aroma / Bitter"
+          maxLength: 50
+          example: "Bitter"
+    amount:
+      type: object
+      properties:
+        value:
+          type: number
+          format: float
+          example: 3.3
+        unit:
+          $ref: "#/components/schemas/weight"
+    weight:
+      type: string
+      enum:
+        - "grams"
+        - "kilograms"
+        - "ounce"
+        - "pounds"
+      default: "kilograms"
+      example: "kilograms"
+    volume:
+      type: object
+      properties:
+        value:
+          type: integer
+          format: int32
+          nullable: false
+          example: 20
+        unit:
+          $ref: "#/components/schemas/volume-units"
+    volume-units:
+      type: string
+      enum:
+        - "litres"
+        - "gallons"
+      example: "litres"
+    method:
+      type: object
+      properties:
+        mash-temps:
+          $ref: "#/components/schemas/mash-temp"
+        fermentation:
+          $ref: "#/components/schemas/temp"
+        twist:
+          type: string
+          maxLength: 255
+    mash-temp:
+      type: array
+      items:
+        type: object
+        properties:
+          temp:
+            $ref: "#/components/schemas/temp"
+          duration:
+            type: integer
+            format: int32
+      example:
+        - temp:
+            value: 64
+            unit: "celsius"
+          duration: 72
+        - temp:
+            value: 30
+            unit: "celsius"
+          duration: 20
+        - temp:
+            value: 50
+            unit: "celsius"
+          duration: 10
+    temp:
+      type: object
+      properties:
+        value:
+          type: integer
+          format: int32
+          nullable: false
+        unit:
+          $ref: "#/components/schemas/temperature-units"
+      example:
+        - value: 64
+          unit: "celsius"
+    temperature-units:
+      type: string
+      enum:
+        - "celsius"
+        - "fahrenheit"
+        - "kelvin"
+      description: ""
+      example: celsius
+
+    beers-list:
+      type: array
+      items:
+        $ref: "#/components/schemas/beer"
+  responses:
+    not-found:
+      description: The specified resource was not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/error"
+          example:
+            code: "404"
+            message: "This is a message the describe the error"
+    bad-request:
+      description: bad-request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/error"
+          example:
+            code: "400"
+            message: "This is a message the describe the error"
+  headers:
+    x-ratelimit-limit:
+      description: limit on the number of requests that can still be made in a one-hour session.
+      schema:
+        type: integer
+        format: int32
+        example: 3600
+    x-ratelimit-limit-remaining:
+      description: number of requests that can still be made in this one-hour session.
+      schema:
+        type: integer
+        format: int32
+        example: 3587
+  parameters:
+    beer-id:
+      name: beer-id
+      in: path
+      description: refers to the identifier id in the system of that beer
+      required: true
+      schema:
+        type: integer
+        format: int32
+    page:
+      name: page
+      in: query
+      description: the number of page the user would have in the paged response
+      required: true
+      schema:
+        type: integer
+        format: int32
+        default: 1
+        example: 2
+        minimum: 1
+    per_page:
+      name: per_page
+      in: query
+      description: the number of element that the user would have in the paged response
+      required: true
+      schema:
+        type: integer
+        format: int32
+        default: 25
+        example: 50
+        minimum: 1
+        maximum: 80
+    abv_gt:
+      name: abv_gt
+      in: query
+      description: Returns all beers with ABV greater than the supplied number
+      required: false
+      schema:
+        type: number
+        format: float
+        example:  4.1
+    abv_lt:
+      name: abv_lt
+      in: query
+      description: Returns all beers with ABV less than the supplied number
+      required: false
+      schema:
+        type: number
+        format: float
+        example:  4.1
+    ibu_gt:
+      name: ibu_gt
+      in: query
+      description: Returns all beers with IBU greater than the supplied number
+      required: false
+      schema:
+        type: number
+        format: float
+        example:  41.4
+    ibu_lt:
+      name: ibu_lt
+      in: query
+      description: Returns all beers with IBU less than the supplied number
+      required: false
+      schema:
+        type: number
+        format: float
+        example:  41.5
+    ebc_gt:
+      name: ebc_gt
+      in: query
+      description: Returns all beers with EBC greater than the supplied number
+      required: false
+      schema:
+        type: number
+        format: float
+        example:  15
+    ebc_lt:
+      name: ebc_lt
+      in: query
+      description: Returns all beers with EBC less than the supplied number
+      required: false
+      schema:
+        type: number
+        format: float
+        example:  15
+    beer_name:
+      name: beer_name
+      in: query
+      description: Returns all beers matching the supplied name (this will match partial strings as well so e.g punk will return Punk IPA), if you need to add spaces just add an underscore (_).
+      required: false
+      schema:
+        type: string
+        example: "punk_ipa"
+    yeast:
+      name: yeast
+      in: query
+      description: Returns all beers matching the supplied yeast name, this performs a fuzzy match, if you need to add spaces just add an underscore (_).
+      required: false
+      schema:
+        type: string
+        example: "Wyeast 1056 - American Ale™"
+    brewed_before:
+      name: brewed_before
+      in: query
+      description: Returns all beers brewed before this date, the date format is mm-yyyy e.g 10-2011
+      required: false
+      schema:
+        type: string
+        maxLength: 7
+        minLength: 7
+        pattern: '[0-1][0-9]\/[1-2][0-9]{3}'
+        example: "09/2007"
+    brewed_after:
+      name: brewed_after
+      in: query
+      description: Returns all beers brewed after this date, the date format is mm-yyyy e.g 10-2011
+      required: false
+      schema:
+        type: string
+        maxLength: 7
+        minLength: 7
+        pattern: '[0-1][0-9]\/[1-2][0-9]{3}'
+        example: "09/2007"
+    hops:
+      name: hops
+      in: query
+      description: |
+        Returns all beers matching the supplied hops name, this performs a fuzzy match, if you need to add spaces just add an underscore (_).
+      required: false
+      schema:
+        type: string
+        example: "Fuggles"
+    malt:
+      name: malt
+      in: query
+      description: |
+        Returns all beers matching the supplied malt name, this performs a fuzzy match, if you need to add spaces just add an underscore (_).
+      required: false
+      schema:
+        type: string
+        example: "Maris Otter Extra Pale"
+    food:
+      name: food
+      in: query
+      description: |
+        Returns all beers matching the supplied food string, this performs a fuzzy match, if you need to add spaces just add an underscore (_).
+      required: false
+      schema:
+        type: string
+        example: "Spicy chicken tikka masala"
+    ids:
+      name: ids
+      in: query
+      description: |
+        Returns all beers matching the supplied ID"s. You can pass in multiple ID"s by separating them with a | symbol.
+      required: false
+      schema:
+        type: string
+        example: "2|56|93"
