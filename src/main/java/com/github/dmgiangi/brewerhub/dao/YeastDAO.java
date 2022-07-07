@@ -9,7 +9,7 @@ public class YeastDAO {
     final static Logger logger = LogManager.getLogger(YeastDAO.class);
 
     Connection connection;
-    public YeastDAO(Connection connection) {
+    public YeastDAO(Connection connection) throws IllegalArgumentException{
         if(connection != null)
             this.connection = connection;
         else throw new IllegalArgumentException("Connection must be not null");
