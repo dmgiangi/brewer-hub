@@ -50,7 +50,7 @@ public class MaltListDAO {
     }
 
     private static final String insertMaltPairing =
-            "INSERT INTO malt_pairings (id_beer, amount, id_malt) VALUES (?, ?);";
+            "INSERT INTO malt_pairings (id_beer, amount, id_malt) VALUES (?, ?, ?);";
     public void insertMaltList(Beer beer) {
         if (beer != null) {
             for (Malt malt : beer.getIngredients().getMalts()) {
