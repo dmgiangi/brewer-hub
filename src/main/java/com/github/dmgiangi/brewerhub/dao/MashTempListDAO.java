@@ -58,7 +58,7 @@ public class MashTempListDAO {
                 try (PreparedStatement statement = connection
                         .prepareStatement(insertMashPairing)) {
                     statement.setInt(1, beer.getId());
-                    statement.setInt(1, new MashTempDAO(connection)
+                    statement.setInt(2, new MashTempDAO(connection)
                             .insertMash(mash));
 
                     if (statement.execute())

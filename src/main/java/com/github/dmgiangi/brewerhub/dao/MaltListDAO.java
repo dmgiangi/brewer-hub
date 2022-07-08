@@ -58,7 +58,7 @@ public class MaltListDAO {
                         .prepareStatement(insertMaltPairing)) {
                     statement.setInt(1, beer.getId());
                     statement.setFloat(2, malt.getWeight().setUnit(WeightUnits.KILOGRAMS).getValue());
-                    statement.setInt(1, new MaltDAO(connection)
+                    statement.setInt(3, new MaltDAO(connection)
                             .getMaltIdAndInsertIfNotExist(malt.getName()));
 
                     if (statement.execute())

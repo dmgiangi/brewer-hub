@@ -24,7 +24,7 @@ public class MashTempDAO {
         try (PreparedStatement statement = connection
                 .prepareStatement(insertMash, Statement.RETURN_GENERATED_KEYS)) {
             statement.setFloat(1, mash.getTemperature().setUnit(TemperatureUnits.CELSIUS).getValue());
-            statement.setFloat(1, mash.getDuration());
+            statement.setFloat(2, mash.getDuration() == null ? 0 : mash.getDuration());
             if (statement.execute()) {
                 ResultSet resultSet = statement.getGeneratedKeys();
                 resultSet.next();

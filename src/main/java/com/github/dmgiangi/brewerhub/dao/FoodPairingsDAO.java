@@ -56,13 +56,13 @@ public class FoodPairingsDAO {
 
 
     private static final String insertFoodPairing =
-            "INSERT INTO food_pairing (food_id, beer_id) VALUES (?, ?);";
+            "INSERT INTO food_pairings (food_id, beer_id) VALUES (?, ?);";
 
     private void insertFoodPairing(Integer beer_id, int food_id) {
         try (PreparedStatement statement = connection
                 .prepareStatement(insertFoodPairing)) {
             statement.setInt(1, food_id);
-            statement.setInt(1, beer_id);
+            statement.setInt(2, beer_id);
             if (statement.execute()) {
                 logger.info("Food Pairing (food_id: " + food_id +
                         ", beer_id: " + beer_id + ")successfully added.");

@@ -151,47 +151,56 @@ public class BeersDAO {
     public Boolean insertBeer(Beer beer){
         try (PreparedStatement statement = connection
                 .prepareStatement(insertBeer, Statement.RETURN_GENERATED_KEYS)) {
-            statement.setString(2, beer.getName());
-            statement.setString(3, beer.getTagline());
-            statement.setString(4, beer.getFirsBrewed());
-            statement.setString(5, beer.getDescription());
-            statement.setString(6, beer.getImageUrl());
-            statement.setFloat(7, beer.getAbv());
-            statement.setFloat(8, beer.getIbu());
-            statement.setFloat(9, beer.getTargetFg());
-            statement.setFloat(10, beer.getTargetOg());
-            statement.setFloat(11, beer.getEbc());
-            statement.setFloat(12, beer.getSrm());
-            statement.setFloat(13, beer.getPh());
-            statement.setFloat(14, beer.getAttenuationLevel());
+            statement.setString(1, beer.getName());
+            statement.setString(2, beer.getTagline());
+            statement.setString(3, beer.getFirsBrewed());
+            statement.setString(4, beer.getDescription());
+            statement.setString(5, beer.getImageUrl());
+            statement.setFloat(6, beer.getAbv());
+            statement.setFloat(7, beer.getIbu());
+            statement.setFloat(8, beer.getTargetFg());
+            statement.setFloat(9, beer.getTargetOg());
+            statement.setFloat(10, beer.getEbc());
+            statement.setFloat(11, beer.getSrm());
+            statement.setFloat(12, beer.getPh());
+            statement.setFloat(13, beer.getAttenuationLevel());
             beer.getMethod().getFermentation().getTemperature().setUnit(TemperatureUnits.CELSIUS);
-            statement.setFloat(15, beer
+            statement.setFloat(14, beer
                     .getMethod()
                     .getFermentation()
                     .getTemperature()
                     .setUnit(TemperatureUnits.CELSIUS)
                     .getValue()
             );
-            statement.setString(16, beer.getMethod().getTwist());
-            statement.setFloat(17, beer.getVolume().setUnit(VolumeUnits.LITRES).getValue());
-            statement.setFloat(18, beer.getBoilVolume().setUnit(VolumeUnits.LITRES).getValue());
-            statement.setString(19, beer.getMethod().getTwist());
-            statement.setString(20, beer.getContributor());
-            statement.setInt(21, new YeastDAO(connection)
+            statement.setString(15, beer.getMethod().getTwist());
+            statement.setFloat(16, beer.getVolume().setUnit(VolumeUnits.LITRES).getValue());
+            statement.setFloat(17, beer.getBoilVolume().setUnit(VolumeUnits.LITRES).getValue());
+            statement.setString(18, beer.getMethod().getTwist());
+            statement.setString(19, beer.getContributor());
+            statement.setInt(20, new YeastDAO(connection)
                     .getYeastIdAndInsertIfNotExist(beer.getIngredients().getYeast()));
-            if (statement.execute()) {
-                ResultSet resultSet = statement.getGeneratedKeys();
-                beer.setId(resultSet.getInt(1));
-            } else return false;
+
+            statement.execute();
+            logger.info("Beer inserted.");
+            ResultSet resultSet = statement.getGeneratedKeys();
+            resultSet.next();
+            beer.setId(resultSet.getInt(1));
 
             if(beer.getId() != 0){
                 new HopListDAO(connection).insertHopList(beer);
-                //new MaltListDAO(connection).insertMaltList(beer.getIngredients().getMalts());
-                //new MashTempListDAO(connection).insertMashTempList(beer.getMethod().getMashTempsList());
+                logger.info("Hop List inserted.");
+                new MaltListDAO(connection).insertMaltList(beer);
+                logger.info("Malt List inserted.");
+                new MashTempListDAO(connection).insertMashTempList(beer);
+                logger.info("Mash List inserted.");
                 new FoodPairingsDAO(connection).insertFoodPairings(beer);
+                logger.info("Foods inserted.");
             } else return false;
         } catch (SQLException e) {
-            logger.error(e.getMessage());
+            logger.error("SQL state: " + e.getSQLState()
+                    + " -> Error code: " + e.getErrorCode() +
+                    " -> Message: " + e.getMessage());
+            e.printStackTrace();
             return false;
         }
 

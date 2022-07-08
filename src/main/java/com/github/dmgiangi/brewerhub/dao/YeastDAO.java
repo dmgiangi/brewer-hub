@@ -27,8 +27,8 @@ public class YeastDAO {
             statement.execute();
             ResultSet resultSet = statement.getGeneratedKeys();
             resultSet.next();
-            id = resultSet.getInt(1);
-
+            id = resultSet.getInt("insert_id");
+            logger.info("yeast id: = " + id);
         } catch (SQLException e) {
             logger.error(e.getMessage());
         }
