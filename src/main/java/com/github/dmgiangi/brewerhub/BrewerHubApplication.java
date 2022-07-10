@@ -19,12 +19,11 @@ import java.io.Reader;
 public class BrewerHubApplication {
 	final static Logger logger = LogManager.getLogger(BrewerHubApplication.class);
 
-	/*public static void main(String[] args) {
-		SpringApplication.run(BrewerHubApplication.class, args);
-		System.out.println(new SqlConnectionFactory().getConnection());
-	}*/
-
 	public static void main(String[] args) {
+		SpringApplication.run(BrewerHubApplication.class, args);
+	}
+
+	/*public static void main(String[] args) {
         Gson gson = new Gson();
         Reader reader = new BrewerHubApplication().getJsonReaderFromResources("/beers.json");
         BeersList beersList = gson.fromJson(reader, new TypeToken<BeersList>(){}.getType());
@@ -35,7 +34,8 @@ public class BrewerHubApplication {
 			beersDAO.insertBeer(beer);
 			logger.info("END OF INSERTING OF BEER WITH ID: " + beer.getId());
 		}
-	}
+	}*/
+
 
 	private Reader getJsonReaderFromResources(String filePath) {
 		Reader reader = null;

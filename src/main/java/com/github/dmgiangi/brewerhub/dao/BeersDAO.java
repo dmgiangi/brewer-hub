@@ -77,7 +77,7 @@ public class BeersDAO {
                             .setSrm(resultSet.getFloat("srm"))
                             .setPh(resultSet.getFloat("ph"))
                             .setAttenuationLevel(resultSet.getFloat("attenuation_level"))
-                            .setBrewersTips(resultSet.getString("brewer_tips"))
+                            .setBrewersTips(resultSet.getString("brewers_tips"))
                             .setFoodPairings(
                                     new FoodPairingsDAO(connection)
                                             .getFoodPairingsByBeerId(resultSet.getInt("id"))
@@ -108,7 +108,7 @@ public class BeersDAO {
                             ).setIngredients(
                                     new Ingredients()
                                             .setYeast(new YeastDAO(connection)
-                                                    .getYeastNameByID(resultSet.getInt("yeast")))
+                                                    .getYeastNameByID(resultSet.getInt("yeast_id")))
                                             .setHops(
                                                     new HopListDAO(connection)
                                                             .getHopListByBeerID(resultSet.getInt("id"))

@@ -44,7 +44,6 @@ public enum WeightUnits {
                  Map.entry(WeightUnits.GRAMS.getValue() + WeightUnits.POUNDS.getValue(), 0.001f),
                  Map.entry(WeightUnits.KILOGRAMS.getValue() + WeightUnits.GRAMS.getValue(), 0.001f),
                  Map.entry(WeightUnits.KILOGRAMS.getValue() + WeightUnits.OUNCE.getValue(), 0.001f),
-                 Map.entry(WeightUnits.KILOGRAMS.getValue() + WeightUnits.POUNDS.getValue(), 0.001f),
                  Map.entry(WeightUnits.OUNCE.getValue() + WeightUnits.GRAMS.getValue(), 0.001f),
                  Map.entry(WeightUnits.OUNCE.getValue() + WeightUnits.KILOGRAMS.getValue(), 0.001f),
                  Map.entry(WeightUnits.OUNCE.getValue() + WeightUnits.POUNDS.getValue(), 0.001f),

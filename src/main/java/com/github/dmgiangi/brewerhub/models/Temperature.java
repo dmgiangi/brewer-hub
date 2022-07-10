@@ -12,7 +12,7 @@ public class Temperature {
   @Getter
   @Accessors(chain = true)
   @SerializedName("value")
-  private Float value = null;
+  private Float value = 0f;
 
   @Getter
   @Accessors(chain = true)
