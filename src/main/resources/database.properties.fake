@@ -1,0 +1,6 @@
+database.type = [mariadb|mysql|sqlite]
+database.host = 127.0.0.1
+database.name = brewer
+database.port = 3306
+database.username = username
+database.password = password
