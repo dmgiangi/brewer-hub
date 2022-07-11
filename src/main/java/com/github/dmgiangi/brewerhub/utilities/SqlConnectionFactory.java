@@ -2,6 +2,8 @@ package com.github.dmgiangi.brewerhub.utilities;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -20,31 +22,13 @@ public class SqlConnectionFactory
     private String password;
     private String port;
 
-    public Connection getConnection()
-    {
-        type = databasePropertyLoader.getProperty("database.type");
-        databaseName = databasePropertyLoader.getProperty("database.name");
-        port = databasePropertyLoader.getProperty("database.port");
-
-        logger.info("Connection To: " + type);
-
-        switch (type) {
-            case "mariadb" -> connectMariaDb();
-            case "sqlite" -> connectSqlite();
-            case "mysql" -> connectMySQL();
-        }
-
-        if (connection != null) {
-            logger.info("Connection Established -> " + connection);
-        } else {
-            logger.error("Connection fail.");
-        }
-
+    public Connection getConnection(){
+        if(connection == null)
+            createConnection();
         return connection;
     }
 
-    private void connectSqlite()
-    {
+    private void connectSqlite() throws SQLException {
         try
         {
             String sb = "jdbc:sqlite:" + databaseName;
@@ -53,13 +37,12 @@ public class SqlConnectionFactory
 
             Class.forName("org.sqlite.JDBC");
             connection = DriverManager.getConnection("jdbc:sqlite:" + databaseName);
-        } catch (ClassNotFoundException | SQLException e) {
+        } catch (ClassNotFoundException e) {
             logger.error(e.getMessage());
         }
     }
 
-    private void connectMySQL()
-    {
+    private void connectMySQL() throws SQLException {
         host = databasePropertyLoader.getProperty("database.host");
         username = databasePropertyLoader.getProperty("database.username");
         password = databasePropertyLoader.getProperty("database.password");
@@ -69,13 +52,12 @@ public class SqlConnectionFactory
             logger.debug("Connecting ... "+getConnInfo());
             Class.forName("com.mysql.jdbc.Driver");
             connection =DriverManager.getConnection(getConnInfo(),username, password);
-        } catch (ClassNotFoundException | SQLException e) {
+        } catch (ClassNotFoundException e) {
             logger.error(e.getMessage());
         }
     }
 
-    private void connectMariaDb()
-    {
+    private void connectMariaDb()  throws SQLException{
         host = databasePropertyLoader.getProperty("database.host");
         username = databasePropertyLoader.getProperty("database.username");
         password = databasePropertyLoader.getProperty("database.password");
@@ -85,7 +67,7 @@ public class SqlConnectionFactory
             logger.debug("Connecting ... " + getConnInfo());
             Class.forName("org.mariadb.jdbc.Driver");
             connection = DriverManager.getConnection(getConnInfo(),username, password);
-        } catch (ClassNotFoundException | SQLException e) {
+        } catch (ClassNotFoundException e) {
             logger.error(e.getMessage());
         }
     }
@@ -107,5 +89,30 @@ public class SqlConnectionFactory
                 host + ":" +
                 port + "/" +
                 databaseName;
+    }
+
+    public void createConnection(){
+        type = databasePropertyLoader.getProperty("database.type");
+        databaseName = databasePropertyLoader.getProperty("database.name");
+        port = databasePropertyLoader.getProperty("database.port");
+
+        logger.info("Connection To: " + type);
+
+        try {
+            switch (type) {
+                case "mariadb" -> connectMariaDb();
+                case "sqlite" -> connectSqlite();
+                case "mysql" -> connectMySQL();
+            }
+        } catch (SQLException e) {
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Unable to connect to the database.");
+        }
+
+        if (connection != null) {
+            logger.info("Connection Established -> " + connection);
+        } else {
+            logger.error("Connection fail.");
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Unable to connect to the database.");
+        }
     }
 }
