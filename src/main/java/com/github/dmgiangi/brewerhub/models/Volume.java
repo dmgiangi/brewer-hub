@@ -12,7 +12,7 @@ public class Volume {
     @Getter
     @Accessors(chain = true)
     @SerializedName("value")
-    private Float value = 0f;
+    private Float value = null;
 
     @Getter
     @Accessors(chain = true)
@@ -28,7 +28,8 @@ public class Volume {
     /*public Volume setValueAndUnit(Float newValue, VolumeUnits toUnit) {}*/
 
     public Volume setUnit(VolumeUnits unit) {
-        this.setValue(VolumeUnits.getConvertedValue(this.value, this.unit, unit));
+        if(this.value != null)
+            this.setValue(VolumeUnits.getConvertedValue(this.value, this.unit, unit));
         this.unit = unit;
         return this;
     }

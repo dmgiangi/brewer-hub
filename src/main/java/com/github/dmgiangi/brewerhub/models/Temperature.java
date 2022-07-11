@@ -12,7 +12,7 @@ public class Temperature {
   @Getter
   @Accessors(chain = true)
   @SerializedName("value")
-  private Float value = 0f;
+  private Float value = null;
 
   @Getter
   @Accessors(chain = true)
@@ -21,11 +21,9 @@ public class Temperature {
 
   public Temperature setValue(Float value) { this.value = value; return this;}
 
-  //TODO implemets this method
-  /*public Temp setValueAndUnit(Float newValue, TemperatureUnits newUnit){}*/
-
   public Temperature setUnit(TemperatureUnits unit) {
-    this.setValue(TemperatureUnits.getConvertedValue(this.value, this.unit, unit));
+    if(this.value != null)
+      this.setValue(TemperatureUnits.getConvertedValue(this.value, this.unit, unit));
     this.unit = unit;
     return this;
   }

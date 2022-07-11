@@ -13,7 +13,7 @@ public class Weight {
   @Getter
   @Accessors(chain = true)
   @SerializedName("value")
-  private Float value = 0f;
+  private Float value = null;
 
   @Getter
   @Accessors(chain = true)
@@ -29,7 +29,8 @@ public class Weight {
   /*public Amount setValueAndUnit(Float newValue, WeightUnits newUnit){}*/
 
   public Weight setUnit(WeightUnits newUnit) {
-    this.setValue(WeightUnits.getConvertedValue(this.value, this.unit, newUnit));
+    if(this.value != null)
+      this.setValue(WeightUnits.getConvertedValue(this.value, this.unit, newUnit));
     this.unit = newUnit;
     return this;
   }
