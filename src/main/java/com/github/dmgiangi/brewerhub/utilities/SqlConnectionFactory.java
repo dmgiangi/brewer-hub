@@ -92,7 +92,7 @@ public class SqlConnectionFactory
 
     public void disconnect()
     {
-        logger.debug("Disconnecting ...");
+        logger.info("Disconnecting: " + connection);
         try {
             connection.close();
         } catch (SQLException e) {
