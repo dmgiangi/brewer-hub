@@ -1,7 +1,7 @@
 package com.github.dmgiangi.brewerhub.dao;
 
 import com.github.dmgiangi.brewerhub.exceptions.InsertException;
-import com.github.dmgiangi.brewerhub.models.*;
+import com.github.dmgiangi.brewerhub.models.entity.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
