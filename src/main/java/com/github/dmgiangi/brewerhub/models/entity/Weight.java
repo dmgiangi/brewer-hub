@@ -1,14 +1,15 @@
-package com.github.dmgiangi.brewerhub.models;
+package com.github.dmgiangi.brewerhub.models.entity;
 
 import com.github.dmgiangi.brewerhub.utilities.Indent;
 import com.google.gson.annotations.SerializedName;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 
 // TODO write javadoc for this class
 @EqualsAndHashCode
-public class Temperature {
+public class Weight {
   @Getter
   @Accessors(chain = true)
   @SerializedName("value")
@@ -17,20 +18,27 @@ public class Temperature {
   @Getter
   @Accessors(chain = true)
   @SerializedName("unit")
-  private TemperatureUnits unit = TemperatureUnits.CELSIUS;
+  private WeightUnits unit = WeightUnits.KILOGRAMS;
 
-  public Temperature setValue(Float value) { this.value = value; return this;}
+  public Weight setValue(Float value) {
+    this.value = value;
+    return this;
+  }
 
-  public Temperature setUnit(TemperatureUnits unit) {
+  //TODO implements this method
+  /*public Amount setValueAndUnit(Float newValue, WeightUnits newUnit){}*/
+
+  public Weight setUnit(WeightUnits newUnit) {
     if(this.value != null)
-      this.setValue(TemperatureUnits.getConvertedValue(this.value, this.unit, unit));
-    this.unit = unit;
+      this.setValue(WeightUnits.getConvertedValue(this.value, this.unit, newUnit));
+    this.unit = newUnit;
     return this;
   }
 
   @Override
   public String toString() {
-    return "Class Temperature: {\n" +
+
+    return "Class Weight: {\n" +
             "    value: " + Indent.toIndentedString(value) + "\n" +
             "    unit: " + Indent.toIndentedString(unit) + "\n" +
             "}";

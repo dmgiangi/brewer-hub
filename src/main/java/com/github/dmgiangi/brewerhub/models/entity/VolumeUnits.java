@@ -1,4 +1,4 @@
-package com.github.dmgiangi.brewerhub.models;
+package com.github.dmgiangi.brewerhub.models.entity;
 
 import java.io.IOException;
 
