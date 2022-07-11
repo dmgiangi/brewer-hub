@@ -1,5 +1,6 @@
 package com.github.dmgiangi.brewerhub.dao;
 
+import com.github.dmgiangi.brewerhub.exceptions.InsertException;
 import com.github.dmgiangi.brewerhub.models.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -23,6 +24,8 @@ public class MaltListDAO {
                     "WHERE malt_pairings.id_beer = ?";
 
     public MaltList getMaltListByBeerID(Integer id) {
+        if (id == null) return null;
+
         MaltList malts = null;
 
         try (PreparedStatement statement = connection.prepareStatement(getMaltListByBeerId)) {
@@ -51,22 +54,30 @@ public class MaltListDAO {
 
     private static final String insertMaltPairing =
             "INSERT INTO malt_pairings (id_beer, amount, id_malt) VALUES (?, ?, ?);";
-    public void insertMaltList(Beer beer) {
+    public void insertMaltList(Beer beer) throws InsertException {
         if (beer != null) {
             for (Malt malt : beer.getIngredients().getMalts()) {
                 try (PreparedStatement statement = connection
                         .prepareStatement(insertMaltPairing)) {
                     statement.setInt(1, beer.getId());
-                    statement.setFloat(2, malt.getWeight().setUnit(WeightUnits.KILOGRAMS).getValue());
+                    statement.setObject(
+                            2,
+                            malt.getWeight().setUnit(WeightUnits.KILOGRAMS).getValue(),
+                            Types.FLOAT);
                     statement.setInt(3, new MaltDAO(connection)
                             .getMaltIdAndInsertIfNotExist(malt.getName()));
 
-                    if (statement.execute())
-                        logger.info("Malt Pairing successfully added.");
+
+                    int affectedRows = statement.executeUpdate();
+
+                    if (affectedRows == 0){
+                        logger.error("Inserting new MALT PAIRING fail.");
+                        throw new InsertException("Inserting new MALT PAIRING fail.");
+                    }
                 } catch (SQLException e) {
                     logger.error(e.getMessage());
+                    throw new InsertException("Inserting new MALT PAIRING fail.");
                 }
-
             }
         }
     }

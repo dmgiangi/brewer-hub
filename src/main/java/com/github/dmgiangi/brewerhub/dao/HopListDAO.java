@@ -1,13 +1,11 @@
 package com.github.dmgiangi.brewerhub.dao;
 
+import com.github.dmgiangi.brewerhub.exceptions.InsertException;
 import com.github.dmgiangi.brewerhub.models.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class HopListDAO {
     final static Logger logger = LogManager.getLogger(HopListDAO.class);
@@ -59,27 +57,39 @@ public class HopListDAO {
         "INSERT INTO hop_pairings" +
                 "( added, quantity, id_beers, id_hops, attribute_id ) VALUES ( ?, ?, ?, ?, ? );";
 
-    public void insertHopList(Beer beer) {
+    public void insertHopList(Beer beer) throws InsertException {
         HopDAO hopDao = new HopDAO(connection);
+        HopAttributeDAO hopAttributeDAO = new HopAttributeDAO(connection);
+
         for (Hop hop : beer.getIngredients().getHops()){
-            int hop_id = hopDao.getHopIdByName(hop.getName());
-            int attribute_id = hopDao.getAttributeIdByName(hop.getAttribute());
-            if(hop_id == 0)
-                hop_id = hopDao.insertHop(hop.getName());
-            if(attribute_id == 0)
-                attribute_id = hopDao.insertAttribute(hop.getAttribute());
+            Integer hop_id = hopDao.getHopIdAndInsertIfNotExist(hop.getAttribute());
+                if(hop_id == null) throw new InsertException("Cannot assign hop with null value to beer");
+
+            Integer attribute_id = hopAttributeDAO.getHopAttributeIdAndInsertIfNotExist(hop.getAttribute());
 
             try (PreparedStatement statement = connection
-                    .prepareStatement(insertHopPairing)) {
+                    .prepareStatement(insertHopPairing, Statement.RETURN_GENERATED_KEYS)){
+
                 statement.setString(1, hop.getAdd());
-                statement.setFloat(2,
-                        hop.getWeight().setUnit(WeightUnits.GRAMS).getValue());
+                statement.setObject(
+                        2,
+                        hop.getWeight().setUnit(WeightUnits.GRAMS).getValue(),
+                        Types.FLOAT
+                );
                 statement.setInt(3, beer.getId());
                 statement.setInt(4, hop_id);
-                statement.setInt(5, attribute_id);
-                statement.execute();
+                statement.setObject(
+                        5,
+                        attribute_id,
+                        Types.INTEGER
+                );
+
+                if(statement.executeUpdate() == 0)
+                    throw new InsertException("Cannot assign hop to beer, no id returned.");
+
             } catch (SQLException e) {
                 logger.error(e.getMessage());
+                throw new InsertException("Cannot assign hop to beer.", e);
             }
         }
     }

@@ -1,10 +1,13 @@
 package com.github.dmgiangi.brewerhub.exceptions;
 
+import lombok.Getter;
+
 import java.sql.SQLException;
 
+@Getter
 public class InsertException extends SQLException {
-    Exception throwingException;
-    public InsertException(String message, Exception exception) {
+    SQLException throwingException;
+    public InsertException(String message, SQLException exception) {
         super(message);
         throwingException = exception;
     }

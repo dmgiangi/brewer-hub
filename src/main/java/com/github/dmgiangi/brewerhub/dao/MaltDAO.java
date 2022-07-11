@@ -1,5 +1,6 @@
 package com.github.dmgiangi.brewerhub.dao;
 
+import com.github.dmgiangi.brewerhub.exceptions.InsertException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -15,7 +16,7 @@ public class MaltDAO {
         else throw new IllegalArgumentException("Connection must be not null");
     }
     
-    public int getMaltIdAndInsertIfNotExist(String MaltName){
+    public int getMaltIdAndInsertIfNotExist(String MaltName) throws InsertException {
         int id = getMaltIdByName(MaltName);
         return id != 0
                 ? id
@@ -26,38 +27,54 @@ public class MaltDAO {
     private static final String insertMalt =
             "INSERT INTO malts (name) VALUES (?);";
 
-    private int insertMalt(String maltName) {
+    private Integer insertMalt(String maltName) throws InsertException {
+        if(maltName == null) return null;
+
+        int id;
         try (PreparedStatement statement = connection
                 .prepareStatement(insertMalt, Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, maltName);
-            if (statement.execute()) {
-                ResultSet resultSet = statement.getGeneratedKeys();
-                resultSet.next();
-                logger.info("Food (" + maltName + ")successfully added.");
-                return resultSet.getInt(1);
+
+            int affectedRows = statement.executeUpdate();
+
+            if (affectedRows == 0) {
+                logger.error("Inserting new MALT fail.");
+                throw new InsertException("Inserting new MALT fail.");
+            }
+
+            try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    id = generatedKeys.getInt(1);
+                }
+                else {
+                    logger.error("Creating new MALT failed, no ID obtained.");
+                    throw new InsertException("Inserting new MALT fail, no ID obtained.");
+                }
             }
         } catch (SQLException e) {
-            logger.error(e.getMessage());
+            logger.error("Inserting new MALT fail.");
+            throw new InsertException("Inserting new MALT fail.", e);
         }
-        return 0;
+        return id;
     }
 
 
     private static final String getMaltIdByName = "SELECT id FROM malts WHERE name = ?;";
 
-    private int getMaltIdByName(String maltName) {
+    private Integer getMaltIdByName(String maltName) {
+        if(maltName == null) return null;
+        int id = 0;
         try (PreparedStatement statement = connection.prepareStatement(getMaltIdByName)) {
             statement.setString(1, maltName);
+
             if (statement.execute()) {
                 ResultSet resultSet = statement.getResultSet();
                 if(resultSet.next())
-                    return resultSet.getInt(1);
-                else
-                    logger.info("No yeast with name: " + maltName + " found");
+                    id = resultSet.getInt(1);
             }
         } catch (SQLException e) {
             logger.error(e.getMessage());
         }
-        return 0;
+        return id;
     }
 }

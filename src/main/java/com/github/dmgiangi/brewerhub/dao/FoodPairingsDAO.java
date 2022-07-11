@@ -1,5 +1,6 @@
 package com.github.dmgiangi.brewerhub.dao;
 
+import com.github.dmgiangi.brewerhub.exceptions.InsertException;
 import com.github.dmgiangi.brewerhub.models.Beer;
 import com.github.dmgiangi.brewerhub.models.FoodPairings;
 import org.apache.logging.log4j.LogManager;
@@ -24,6 +25,8 @@ public class FoodPairingsDAO {
             "WHERE food_pairings.beer_id = ?";
 
     public FoodPairings getFoodPairingsByBeerId(Integer id) throws IllegalArgumentException{
+        if(id == null) return null;
+
         FoodPairings foodPairings = null;
 
         try (PreparedStatement statement = connection.prepareStatement(getFoodsByBeerId)) {
@@ -42,13 +45,11 @@ public class FoodPairingsDAO {
         return foodPairings;
     }
 
-    public void insertFoodPairings(Beer beer) throws IllegalArgumentException{
+    public void insertFoodPairings(Beer beer) throws IllegalArgumentException, InsertException {
         if(beer != null){
+            FoodsDAO foodsDAO = new FoodsDAO(connection);
             for (String food_name : beer.getFoodPairings()) {
-                int food_id = this.getFoodIdByName(food_name);
-                if(food_id == 0){
-                    food_id = this.insertFood(food_name);
-                }
+                int food_id = foodsDAO.getFoodIdByNameInsertIfNotExists(food_name);
                 this.insertFoodPairing(beer.getId(), food_id);
             }
         } else throw new IllegalArgumentException("Beer must be not null");
@@ -58,56 +59,18 @@ public class FoodPairingsDAO {
     private static final String insertFoodPairing =
             "INSERT INTO food_pairings (food_id, beer_id) VALUES (?, ?);";
 
-    private void insertFoodPairing(Integer beer_id, int food_id) {
+    private void insertFoodPairing(int beer_id, int food_id) throws InsertException {
         try (PreparedStatement statement = connection
                 .prepareStatement(insertFoodPairing)) {
             statement.setInt(1, food_id);
             statement.setInt(2, beer_id);
-            if (statement.execute()) {
-                logger.info("Food Pairing (food_id: " + food_id +
-                        ", beer_id: " + beer_id + ")successfully added.");
+            if(statement.executeUpdate() == 0){
+                logger.error("Insert FOOD PAIRING fail.");
+                throw  new InsertException("Insert FOOD PAIRING fail.");
             }
         } catch (SQLException e) {
-            logger.error(e.getMessage());
+            logger.error("Insert FOOD PAIRING fail.");
+            throw  new InsertException("Insert FOOD PAIRING fail.", e);
         }
-    }
-
-
-    private static final String insertFood =
-            "INSERT INTO foods (name) VALUES (?);";
-
-    private int insertFood(String food_name) {
-        try (PreparedStatement statement = connection
-                .prepareStatement(insertFood, Statement.RETURN_GENERATED_KEYS)) {
-            statement.setString(1, food_name);
-            if (statement.execute()) {
-                ResultSet resultSet = statement.getGeneratedKeys();
-                resultSet.next();
-                logger.info("Food (" + food_name + ")successfully added.");
-                return resultSet.getInt(1);
-            }
-        } catch (SQLException e) {
-            logger.error(e.getMessage());
-        }
-        return 0;
-    }
-
-
-    private static final String getFoodIdByName =
-            "SELECT id FROM foods WHERE name = ?";
-
-    public int getFoodIdByName(String foodName){
-        try (PreparedStatement statement = connection
-                .prepareStatement(getFoodIdByName)) {
-            statement.setString(1, foodName);
-            if (statement.execute()) {
-                ResultSet resultSet = statement.getResultSet();
-                resultSet.next();
-                return resultSet.getInt(1);
-            }
-        } catch (SQLException e) {
-            logger.error(e.getMessage());
-        }
-        return 0;
     }
 }

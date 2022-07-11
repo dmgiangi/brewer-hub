@@ -1,5 +1,6 @@
 package com.github.dmgiangi.brewerhub.dao;
 
+import com.github.dmgiangi.brewerhub.exceptions.InsertException;
 import com.github.dmgiangi.brewerhub.models.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -25,6 +26,8 @@ public class MashTempListDAO {
             "WHERE mash_sequences.id_beer = ?";
 
     public MashTempList getMashTempListByBeerId(Integer id) throws IllegalArgumentException{
+        if(id == null) return null;
+
         MashTempList mashTempList = null;
 
         try (PreparedStatement statement = connection.prepareStatement(getMashTempListByBeerId)) {
@@ -52,7 +55,7 @@ public class MashTempListDAO {
 
     private static final String insertMashPairing =
             "INSERT INTO mash_sequences (id_beer, id_mash) VALUES (?, ?);";
-    public void insertMashTempList(Beer beer) {
+    public void insertMashTempList(Beer beer) throws InsertException {
         if (beer != null) {
             for (MashTemp mash : beer.getMethod().getMashTempsList()) {
                 try (PreparedStatement statement = connection
@@ -61,12 +64,14 @@ public class MashTempListDAO {
                     statement.setInt(2, new MashTempDAO(connection)
                             .insertMash(mash));
 
-                    if (statement.execute())
-                        logger.info("Mash Pairing successfully added.");
+                    if (statement.executeUpdate() == 0){
+                        logger.error("MASH PAIRING fail to add, no ID obtained from database.");
+                        throw new InsertException("MASH PAIRING fail to add, no ID obtained from database.");
+                    }
                 } catch (SQLException e) {
-                    logger.error(e.getMessage());
+                    logger.error("MASH PAIRING fail to add.");
+                    throw new InsertException("MASH PAIRING fail to add.", e);
                 }
-
             }
         }
     }

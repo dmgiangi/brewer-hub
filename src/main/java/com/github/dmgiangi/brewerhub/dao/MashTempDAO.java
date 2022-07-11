@@ -1,5 +1,6 @@
 package com.github.dmgiangi.brewerhub.dao;
 
+import com.github.dmgiangi.brewerhub.exceptions.InsertException;
 import com.github.dmgiangi.brewerhub.models.MashTemp;
 import com.github.dmgiangi.brewerhub.models.TemperatureUnits;
 import org.apache.logging.log4j.LogManager;
@@ -19,19 +20,34 @@ public class MashTempDAO {
 
     private static final String insertMash =
             "INSERT INTO mash_subsequences (temperature, duration) VALUES (?, ?);";
-    public int insertMash(MashTemp mash) {
-        int id = 0;
+    public Integer insertMash(MashTemp mash) throws InsertException {
+        if(mash == null) return null;
+
+        int id;
         try (PreparedStatement statement = connection
                 .prepareStatement(insertMash, Statement.RETURN_GENERATED_KEYS)) {
-            statement.setFloat(1, mash.getTemperature().setUnit(TemperatureUnits.CELSIUS).getValue());
-            statement.setFloat(2, mash.getDuration() == null ? 0 : mash.getDuration());
-            if (statement.execute()) {
-                ResultSet resultSet = statement.getGeneratedKeys();
-                resultSet.next();
-                id = resultSet.getInt(1);
+            statement.setObject(1, mash.getTemperature().setUnit(TemperatureUnits.CELSIUS).getValue(), Types.FLOAT);
+            statement.setObject(2, mash.getDuration(),Types.FLOAT);
+
+            int affectedRows = statement.executeUpdate();
+
+            if (affectedRows == 0) {
+                logger.error("Inserting new MASH SUB-SEQUENCES fail.");
+                throw new InsertException("Inserting new MASH SUB-SEQUENCES fail.");
+            }
+
+            try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    id = generatedKeys.getInt(1);
+                }
+                else {
+                    logger.error("Creating new MASH SUB-SEQUENCES failed, no ID obtained.");
+                    throw new InsertException("Creating new MASH SUB-SEQUENCES failed, no ID obtained.");
+                }
             }
         } catch (SQLException e) {
-            logger.error(e.getMessage());
+            logger.error("Inserting new MASH SUB-SEQUENCES fail.");
+            throw new InsertException("Inserting new MASH SUB-SEQUENCES fail.", e);
         }
         return id;
     }

@@ -1,5 +1,6 @@
 package com.github.dmgiangi.brewerhub.dao;
 
+import com.github.dmgiangi.brewerhub.exceptions.InsertException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -16,21 +17,31 @@ public class YeastDAO {
     }
 
     private static final String insertYeast = "INSERT INTO yeasts (name) VALUE ( ? )";
-
-    private int insertYeast(String yeastName){
-        int id = 0;
+    private int insertYeast(String yeastName) throws InsertException {
+        int id;
 
         try (PreparedStatement statement = connection
                 .prepareStatement(insertYeast, Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, yeastName);
 
-            statement.execute();
-            ResultSet resultSet = statement.getGeneratedKeys();
-            resultSet.next();
-            id = resultSet.getInt("insert_id");
-            logger.info("yeast id: = " + id);
+            int affectedRows = statement.executeUpdate();
+
+            if (affectedRows == 0) {
+                logger.error("Inserting new YEAST fail.");
+            }
+
+            try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    id = generatedKeys.getInt(1);
+                }
+                else {
+                    logger.error("Creating new YEAST failed, no ID obtained.");
+                    throw new InsertException("Creating new YEAST failed, no ID obtained from database.");
+                }
+            }
         } catch (SQLException e) {
             logger.error(e.getMessage());
+            throw new InsertException("Creating new YEAST failed", e);
         }
 
         return id;
@@ -43,12 +54,13 @@ public class YeastDAO {
 
         try (PreparedStatement statement = connection.prepareStatement(getYeastIdByName)) {
             statement.setString(1, yeastName);
+
             if (statement.execute()) {
                 ResultSet resultSet = statement.getResultSet();
                 if(resultSet.next())
                     id = resultSet.getInt(1);
                 else
-                    logger.info("No yeast with name: " + yeastName + " found");
+                    logger.info("No YEAST with name: " + yeastName + " found");
             }
         } catch (SQLException e) {
             logger.error(e.getMessage());
@@ -78,7 +90,7 @@ public class YeastDAO {
         return yeast;
     }
 
-    public int getYeastIdAndInsertIfNotExist(String yeastName){
+    public int getYeastIdAndInsertIfNotExist(String yeastName) throws InsertException{
         int id = getYeastIdByName(yeastName);
         return id != 0
                 ? id

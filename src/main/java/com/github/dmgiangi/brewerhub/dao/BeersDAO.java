@@ -201,6 +201,7 @@ public class BeersDAO {
                             new FoodPairingsDAO(connection).insertFoodPairings(beer);
                         }
                         connection.commit();
+                        logger.info("Beer with id: " + beer.getId() + " inserted. Transaction committed.");
                     }
                     else {
                         connection.rollback();
