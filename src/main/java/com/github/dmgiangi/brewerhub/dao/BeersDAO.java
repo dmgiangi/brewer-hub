@@ -40,12 +40,12 @@ public class BeersDAO {
     }
 
     private final static String getBeersList = "SELECT * FROM beers LIMIT ? OFFSET ?";
-    public BeersList selectBeersList(int per_page, int page_number) throws IllegalArgumentException{
+    public BeersList selectBeersList(int page, int per_page) throws IllegalArgumentException{
         BeersList beersList = null;
 
         try (PreparedStatement statement = connection.prepareStatement(getBeersList)) {
             statement.setInt(1, per_page);
-            statement.setInt(2, page_number * per_page);
+            statement.setInt(2, page * per_page);
             if (statement.execute()) {
                 ResultSet resultSet = statement.getResultSet();
                 beersList = getBeersFromResultSet(resultSet);
