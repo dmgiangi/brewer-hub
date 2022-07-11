@@ -21,8 +21,8 @@ public class MashTempListDAO {
     }
 
     private static final String getMashTempListByBeerId = "SELECT temperature, duration " +
-            "FROM mash_sequences " +
-            "INNER JOIN mash_sequences ON ( mash_subsequences.id = mash_sequences.id_mash " +
+            "FROM mash_subsequences " +
+            "INNER JOIN mash_sequences ON ( mash_subsequences.id = mash_sequences.id_mash ) " +
             "WHERE mash_sequences.id_beer = ?";
 
     public MashTempList getMashTempListByBeerId(Integer id) throws IllegalArgumentException{

@@ -219,4 +219,25 @@ public class BeersDAO {
             throw new InsertException("Cannot connect to the database", e);
         }
     }
+
+    private static final String selectRandomBeer =
+            "SELECT * FROM beers ORDER BY RAND() LIMIT 1;";
+    public Beer selectRandomBeer() {
+        BeersList beersList = null;
+
+        try (PreparedStatement statement = connection.prepareStatement(selectRandomBeer)) {
+            if (statement.execute()) {
+                ResultSet resultSet = statement.getResultSet();
+                beersList = getBeersFromResultSet(resultSet);
+            }
+        } catch (SQLException e) {
+            logger.error(e.getMessage());
+        }
+
+        return beersList == null
+                ? null
+                : beersList.isEmpty()
+                ? null
+                : beersList.get(0);
+    }
 }
