@@ -1,5 +1,6 @@
 package com.github.dmgiangi.brewerhub.dao;
 
+import com.github.dmgiangi.brewerhub.exceptions.InsertException;
 import com.github.dmgiangi.brewerhub.models.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -148,62 +149,73 @@ public class BeersDAO {
             "brewers_tips, " +
             "contributed_by, " +
             "yeast_id) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );";
-    public Boolean insertBeer(Beer beer){
-        try (PreparedStatement statement = connection
-                .prepareStatement(insertBeer, Statement.RETURN_GENERATED_KEYS)) {
-            statement.setString(1, beer.getName());
-            statement.setString(2, beer.getTagline());
-            statement.setString(3, beer.getFirsBrewed());
-            statement.setString(4, beer.getDescription());
-            statement.setString(5, beer.getImageUrl());
-            statement.setFloat(6, beer.getAbv());
-            statement.setFloat(7, beer.getIbu());
-            statement.setFloat(8, beer.getTargetFg());
-            statement.setFloat(9, beer.getTargetOg());
-            statement.setFloat(10, beer.getEbc());
-            statement.setFloat(11, beer.getSrm());
-            statement.setFloat(12, beer.getPh());
-            statement.setFloat(13, beer.getAttenuationLevel());
-            beer.getMethod().getFermentation().getTemperature().setUnit(TemperatureUnits.CELSIUS);
-            statement.setFloat(14, beer
-                    .getMethod()
-                    .getFermentation()
-                    .getTemperature()
-                    .setUnit(TemperatureUnits.CELSIUS)
-                    .getValue()
-            );
-            statement.setString(15, beer.getMethod().getTwist());
-            statement.setFloat(16, beer.getVolume().setUnit(VolumeUnits.LITRES).getValue());
-            statement.setFloat(17, beer.getBoilVolume().setUnit(VolumeUnits.LITRES).getValue());
-            statement.setString(18, beer.getMethod().getTwist());
-            statement.setString(19, beer.getContributor());
-            statement.setInt(20, new YeastDAO(connection)
-                    .getYeastIdAndInsertIfNotExist(beer.getIngredients().getYeast()));
+    public void insertBeer(Beer beer) throws InsertException {
+        try {
+            connection.setAutoCommit(false);
+            try (PreparedStatement statement = connection
+                    .prepareStatement(insertBeer, Statement.RETURN_GENERATED_KEYS)) {
+                statement.setString(1, beer.getName());
+                statement.setString(2, beer.getTagline());
+                statement.setString(3, beer.getFirsBrewed());
+                statement.setString(4, beer.getDescription());
+                statement.setString(5, beer.getImageUrl());
+                statement.setObject(6, beer.getAbv(), Types.FLOAT);
+                statement.setObject(7, beer.getIbu(), Types.FLOAT);
+                statement.setObject(8, beer.getTargetFg(), Types.FLOAT);
+                statement.setObject(9, beer.getTargetOg(), Types.FLOAT);
+                statement.setObject(10, beer.getEbc(), Types.FLOAT);
+                statement.setObject(11, beer.getSrm(), Types.FLOAT);
+                statement.setObject(12, beer.getPh(), Types.FLOAT);
+                statement.setObject(13, beer.getAttenuationLevel(), Types.FLOAT);
+                statement.setObject(
+                        14,
+                        beer.getMethod()
+                                .getFermentation()
+                                .getTemperature()
+                                .setUnit(TemperatureUnits.CELSIUS)
+                                .getValue(),
+                        Types.FLOAT
+                );
+                statement.setString(15, beer.getMethod().getTwist());
+                statement.setObject(16, beer.getVolume().setUnit(VolumeUnits.LITRES).getValue());
+                statement.setObject(17, beer.getBoilVolume().setUnit(VolumeUnits.LITRES).getValue());
+                statement.setString(18, beer.getMethod().getTwist());
+                statement.setString(19, beer.getContributor());
+                statement.setObject(
+                        20,
+                        beer.getIngredients().getYeast() != null
+                                ? new YeastDAO(connection)
+                                .getYeastIdAndInsertIfNotExist(beer.getIngredients().getYeast())
+                                : null
+                        , Types.INTEGER);
 
-            statement.execute();
-            logger.info("Beer inserted.");
-            ResultSet resultSet = statement.getGeneratedKeys();
-            resultSet.next();
-            beer.setId(resultSet.getInt(1));
+                if(statement.executeUpdate() != 0) {
+                    ResultSet generatedKeys = statement.getGeneratedKeys();
+                    if (generatedKeys.next()) {
+                        beer.setId(generatedKeys.getInt(1));
 
-            if(beer.getId() != 0){
-                new HopListDAO(connection).insertHopList(beer);
-                logger.info("Hop List inserted.");
-                new MaltListDAO(connection).insertMaltList(beer);
-                logger.info("Malt List inserted.");
-                new MashTempListDAO(connection).insertMashTempList(beer);
-                logger.info("Mash List inserted.");
-                new FoodPairingsDAO(connection).insertFoodPairings(beer);
-                logger.info("Foods inserted.");
-            } else return false;
+                        if (beer.getId() != 0) {
+                            new HopListDAO(connection).insertHopList(beer);
+                            new MaltListDAO(connection).insertMaltList(beer);
+                            new MashTempListDAO(connection).insertMashTempList(beer);
+                            new FoodPairingsDAO(connection).insertFoodPairings(beer);
+                        }
+                        connection.commit();
+                    }
+                    else {
+                        connection.rollback();
+                        logger.error("Creating new BEER failed, no ID obtained.");
+                        throw new InsertException("Creating new BEER failed, no ID obtained.");
+                    }
+                }
+            } catch (SQLException e) {
+                connection.rollback();
+                logger.error("Creating new BEER failed");
+                throw new InsertException("Creating new BEER failed", e);
+            }
         } catch (SQLException e) {
-            logger.error("SQL state: " + e.getSQLState()
-                    + " -> Error code: " + e.getErrorCode() +
-                    " -> Message: " + e.getMessage());
-            e.printStackTrace();
-            return false;
+            logger.error("unable to set auto-commit = false");
+            throw new InsertException("Cannot connect to the database", e);
         }
-
-        return true;
     }
 }
