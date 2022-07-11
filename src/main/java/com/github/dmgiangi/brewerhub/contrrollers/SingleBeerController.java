@@ -8,10 +8,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-
-public class Controller {
+public class SingleBeerController {
    @GetMapping("/beers/{id}")
    public Beer getBeer(@PathVariable int id){
-      return new BeersDAO(new SqlConnectionFactory().getConnection()).selectBeerById(id);
+      SqlConnectionFactory connectionFactory = new SqlConnectionFactory();
+      Beer beer = new BeersDAO(connectionFactory.getConnection()).selectBeerById(id);
+      connectionFactory.disconnect();
+      return beer;
    }
 }
