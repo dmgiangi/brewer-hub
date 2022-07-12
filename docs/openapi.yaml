@@ -6,7 +6,7 @@ info:
     This API make available information about craft beer
 servers:
   - url: http://129.152.5.86:8080
-        description: fresh backend
+    description: fresh backend
   - url: https://api.punkapi.com/v2
     description: old backend
 paths:
