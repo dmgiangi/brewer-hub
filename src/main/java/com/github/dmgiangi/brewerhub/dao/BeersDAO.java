@@ -62,7 +62,7 @@ public class BeersDAO {
                 : beersList.get(0);
     }
 
-    public BeersList selectBeersList(int page, int per_page, Float abv_gt,
+    public BeersList selectBeersList(Integer page, Integer per_page, Float abv_gt,
                                      Float abv_lt, Float ibu_gt, Float ibu_lt, Float ebc_gt,
                                      Float ebc_lt, String beer_name, String yeast, String brewed_before,
                                      String brewed_after, String hop, String malt, String food, String ids

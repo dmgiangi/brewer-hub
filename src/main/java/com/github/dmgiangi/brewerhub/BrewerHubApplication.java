@@ -8,7 +8,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class BrewerHubApplication {
 	final static Logger logger = LogManager.getLogger(BrewerHubApplication.class);
-
 	public static void main(String[] args) {
 		SpringApplication.run(BrewerHubApplication.class, args);
 	}
