@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import java.sql.Date;
+
 @Getter
 @Setter
 @Accessors(chain = true)
@@ -22,7 +24,7 @@ public class Beer {
   private String tagline = null;
 
   @SerializedName("first_brewed")
-  private String firsBrewed = null;
+  private Date firsBrewed = null;
 
   @SerializedName("description")
   private String description = null;

@@ -1,36 +1,74 @@
 package com.github.dmgiangi.brewerhub.controllers;
 
 import com.github.dmgiangi.brewerhub.dao.BeersDAO;
-import com.github.dmgiangi.brewerhub.models.BeersList;
+import com.github.dmgiangi.brewerhub.models.entity.BeersList;
 import com.github.dmgiangi.brewerhub.utilities.SqlConnectionFactory;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.sql.Date;
 
 @RestController
 public class BeersController {
 
     @GetMapping(path = "/beers",
-            params = {"page" , "per_page"},
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public BeersList findPaginated(
+    public ResponseEntity<BeersList> findPaginated(
             HttpServletRequest request,
+            HttpServletResponse response,
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "80") int per_page) {
+            @RequestParam(defaultValue = "80") int per_page,
+            @RequestParam(required = false) Float abv_gt,
+            @RequestParam(required = false) Float abv_lt,
+            @RequestParam(required = false) Float ibu_gt,
+            @RequestParam(required = false) Float ibu_lt,
+            @RequestParam(required = false) Float ebc_gt,
+            @RequestParam(required = false) Float ebc_lt,
+            @RequestParam(required = false) String beer_name,
+            @RequestParam(required = false) String yeast,
+            @RequestParam(required = false) String brewed_before,
+            @RequestParam(required = false) String brewed_after,
+            @RequestParam(required = false) String hops,
+            @RequestParam(required = false) String malt,
+            @RequestParam(required = false) String food,
+            @RequestParam(required = false) String ids) {
+
         if(page < 1) page = 1;
         if(per_page < 1 || per_page > 80) per_page = 80;
 
+        SqlConnectionFactory connectionFactory;
+        connectionFactory = new SqlConnectionFactory();
+        connectionFactory.createConnection();
+
         BeersList resultPage;
 
-        SqlConnectionFactory connectionFactory = new SqlConnectionFactory();
-        resultPage = new BeersDAO(connectionFactory.getConnection()).selectBeersList(page, per_page);
+        resultPage = new BeersDAO(connectionFactory.getConnection()).selectBeersList(
+                page,
+                per_page,
+                abv_gt,
+                abv_lt,
+                ibu_gt,
+                ibu_lt,
+                ebc_gt,
+                ebc_lt,
+                beer_name == null ? null : beer_name.trim().replace('_', ' '),
+                yeast == null ? null : yeast.trim().replace('_', ' '),
+                brewed_before,
+                brewed_after,
+                hops == null ? null : hops.trim().replace('_', ' '),
+                malt == null ? null : malt.trim().replace('_', ' '),
+                food == null ? null : food.trim().replace('_', ' '),
+                ids
+        );
         connectionFactory.disconnect();
-
-        return resultPage;
+        return new ResponseEntity<>(resultPage, new HttpHeaders(), HttpStatus.OK);
     }
 }
 

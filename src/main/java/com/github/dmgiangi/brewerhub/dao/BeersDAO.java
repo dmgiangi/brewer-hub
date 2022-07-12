@@ -1,6 +1,8 @@
 package com.github.dmgiangi.brewerhub.dao;
 
 import com.github.dmgiangi.brewerhub.exceptions.InsertException;
+import com.github.dmgiangi.brewerhub.models.JdbcBooleanOperator;
+import com.github.dmgiangi.brewerhub.models.JdbcConditionBuilder;
 import com.github.dmgiangi.brewerhub.models.entity.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -19,7 +21,7 @@ public class BeersDAO {
 
 
     private final static String getBeerById = "SELECT * FROM beers WHERE beers.id = ?";
-    public Beer selectBeerById(int id){
+    public Beer getBeerById(int id){
         BeersList beersList = null;
 
         try (PreparedStatement statement = connection.prepareStatement(getBeerById)) {
@@ -39,13 +41,12 @@ public class BeersDAO {
                 : beersList.get(0);
     }
 
-    private final static String getBeersList = "SELECT * FROM beers LIMIT ? OFFSET ?";
-    public BeersList selectBeersList(int page, int per_page) throws IllegalArgumentException{
+    private final static String getBeerByName = "SELECT * FROM beers WHERE beers.name = ?";
+    public Beer getBeerByName(String name){
         BeersList beersList = null;
 
-        try (PreparedStatement statement = connection.prepareStatement(getBeersList)) {
-            statement.setInt(1, per_page);
-            statement.setInt(2, page * per_page);
+        try (PreparedStatement statement = connection.prepareStatement(getBeerByName)) {
+            statement.setString(1, name);
             if (statement.execute()) {
                 ResultSet resultSet = statement.getResultSet();
                 beersList = getBeersFromResultSet(resultSet);
@@ -54,7 +55,95 @@ public class BeersDAO {
             logger.error(e.getMessage());
         }
 
+        return beersList == null
+                ? null
+                : beersList.isEmpty()
+                ? null
+                : beersList.get(0);
+    }
+
+    public BeersList selectBeersList(int page, int per_page, Float abv_gt,
+                                     Float abv_lt, Float ibu_gt, Float ibu_lt, Float ebc_gt,
+                                     Float ebc_lt, String beer_name, String yeast, String brewed_before,
+                                     String brewed_after, String hop, String malt, String food, String ids
+    ) throws IllegalArgumentException{
+        BeersList beersList = new BeersList();
+        String sqlQuery = "SELECT * FROM beers b ";
+
+        JdbcConditionBuilder idConditionBuilder = new JdbcConditionBuilder(JdbcBooleanOperator.OR);
+        if (ids != null && !"".equals(ids)) {
+            for (String id : ids.split("_")) {
+                idConditionBuilder.addIntCondition("b.id = ?", id);
+            }
+        }
+
+        JdbcConditionBuilder conditionBuilder = new JdbcConditionBuilder(JdbcBooleanOperator.AND);
+        conditionBuilder.addCondition(idConditionBuilder.getConditionWithParenthesis())
+                .addCondition("b.abv > ?", abv_gt)
+                .addCondition("b.abv < ?", abv_lt)
+                .addCondition("b.ibu > ?", ibu_gt)
+                .addCondition("b.ibu < ?", ibu_lt)
+                .addCondition("b.ebc > ?", ebc_gt)
+                .addCondition("b.ebc < ?", ebc_lt)
+                .addCondition("name LIKE '%?%'", beer_name)
+                .addDateCondition(
+                    "b.first_brewed >= '?'",
+                    brewed_after,
+                    "MM-yyyy")
+                .addDateCondition(
+                    "b.first_brewed <= '?'",
+                    brewed_before,
+                    "MM-yyyy")
+                .addCondition(
+                        "EXISTS ( SELECT FROM yeasts y " +
+                        "WHERE y.id = b.yeast_id AND y.name LIKE '%?%')", yeast)
+                .addCondition(
+                        "EXISTS ( " +
+                        "SELECT mp.id_beer, mp.id_malt " +
+                        "FROM malt_pairings mp " +
+                        "INNER JOIN malts m ON mp.id_malt = m.id " +
+                        "WHERE mp.id_beer = b.id AND m.name LIKE '%?%')", malt)
+                .addCondition(
+                    "EXISTS ( " +
+                    "SELECT hp.id_hops, hp.id_beers " +
+                    "FROM hop_pairings hp " +
+                    "INNER JOIN hops h ON h.id = hp.id_hops " +
+                    "WHERE hp.id_beers = b.id AND h.name LIKE '%?%')", hop)
+                .addCondition(
+                    "EXISTS ( " +
+                    "SELECT * " +
+                    "FROM food_pairings fp " +
+                    "INNER JOIN foods f ON fp.food_id = f.id " +
+                    "WHERE fp.beer_id = b.id AND f.name LIKE '%?%')", food);
+
+        if(!"".equals(conditionBuilder.getCondition()))
+            sqlQuery += "WHERE " + conditionBuilder.getCondition();
+
+        sqlQuery += (" LIMIT " + per_page + " OFFSET " + (per_page * (page - 1)) + ";");
+        logger.info(sqlQuery);
+
+        try (Statement statement = connection.createStatement()) {
+            if (statement.execute(sqlQuery)) {
+                ResultSet resultSet = statement.getResultSet();
+                beersList = getBeersFromResultSet(resultSet);
+            }
+        } catch (SQLException e) {
+            logger.error(e.getMessage());
+        }
+
+        //TODO filter beer list per hops malt yeast food
         return beersList;
+    }
+
+    private StringBuilder and(StringBuilder stringBuilder) {
+        if(!stringBuilder.toString().endsWith("WHERE "))
+            stringBuilder.append("AND ");
+        return stringBuilder;
+    }
+    private StringBuilder or(StringBuilder stringBuilder, String suffix) {
+        if(stringBuilder.toString().endsWith(suffix))
+            stringBuilder.append("OR ");
+        return stringBuilder;
     }
 
     private BeersList getBeersFromResultSet(ResultSet resultSet){
@@ -67,7 +156,7 @@ public class BeersDAO {
                             .setName(resultSet.getString("name"))
                             .setTagline(resultSet.getString("tagline"))
                             .setContributor(resultSet.getString("contributed_by"))
-                            .setFirsBrewed(resultSet.getString("first_brewed"))
+                            .setFirsBrewed(resultSet.getDate("first_brewed"))
                             .setDescription(resultSet.getString("description"))
                             .setImageUrl(resultSet.getString("image_url"))
                             .setAbv(resultSet.getFloat("abv"))
@@ -156,7 +245,7 @@ public class BeersDAO {
                     .prepareStatement(insertBeer, Statement.RETURN_GENERATED_KEYS)) {
                 statement.setString(1, beer.getName());
                 statement.setString(2, beer.getTagline());
-                statement.setString(3, beer.getFirsBrewed());
+                statement.setDate(3, beer.getFirsBrewed());
                 statement.setString(4, beer.getDescription());
                 statement.setString(5, beer.getImageUrl());
                 statement.setObject(6, beer.getAbv(), Types.FLOAT);

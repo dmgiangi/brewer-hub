@@ -20,7 +20,7 @@ public class HopListDAO {
     private static final String getHopListByBeerId =
             "SELECT attribute, name, added, quantity " +
             "FROM hop_attributes " +
-            "INNER JOIN hop_pairings ON ( hop_attributes.id = hop_pairings.id  ) " +
+            "INNER JOIN hop_pairings ON ( hop_attributes.id = hop_pairings.attribute_id ) " +
             "INNER JOIN hops ON ( hop_pairings.id_hops = hops.id ) " +
             "WHERE hop_pairings.id_beers = ?";
 
@@ -62,7 +62,7 @@ public class HopListDAO {
         HopAttributeDAO hopAttributeDAO = new HopAttributeDAO(connection);
 
         for (Hop hop : beer.getIngredients().getHops()){
-            Integer hop_id = hopDao.getHopIdAndInsertIfNotExist(hop.getAttribute());
+            Integer hop_id = hopDao.getHopIdAndInsertIfNotExist(hop.getName());
                 if(hop_id == null) throw new InsertException("Cannot assign hop with null value to beer");
 
             Integer attribute_id = hopAttributeDAO.getHopAttributeIdAndInsertIfNotExist(hop.getAttribute());

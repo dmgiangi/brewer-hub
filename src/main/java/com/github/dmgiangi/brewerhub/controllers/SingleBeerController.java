@@ -1,7 +1,7 @@
 package com.github.dmgiangi.brewerhub.controllers;
 
 import com.github.dmgiangi.brewerhub.dao.BeersDAO;
-import com.github.dmgiangi.brewerhub.models.Beer;
+import com.github.dmgiangi.brewerhub.models.entity.Beer;
 import com.github.dmgiangi.brewerhub.utilities.SqlConnectionFactory;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,7 +14,7 @@ public class SingleBeerController {
    @GetMapping("/{id}")
    public Beer getBeer(@PathVariable int id){
       SqlConnectionFactory connectionFactory = new SqlConnectionFactory();
-      Beer beer = new BeersDAO(connectionFactory.getConnection()).selectBeerById(id);
+      Beer beer = new BeersDAO(connectionFactory.getConnection()).getBeerById(id);
       connectionFactory.disconnect();
       return beer;
    }
