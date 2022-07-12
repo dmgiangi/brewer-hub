@@ -12,10 +12,12 @@
 
 	<groupId>com.github.dmgiangi</groupId>
 	<artifactId>brewer-hub</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<name>brewer-hub</name>
 	<url>https://github.com/dmgiangi/breewer-hub</url>
 	<description>Backend project that allow to get information about beers trough public API</description>
+
+	<packaging>war</packaging>
 
 	<properties>
 		<java.version>17</java.version>
@@ -58,9 +60,15 @@
 			<artifactId>log4j-core</artifactId>
 			<version>2.17.2</version>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-tomcat</artifactId>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
+		<finalName>${project.artifactId}</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
