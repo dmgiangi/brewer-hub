@@ -5,10 +5,10 @@ info:
   description: |
     This API make available information about craft beer
 servers:
-  - url: https://api.punkapi.com/v2
-    description: old backend
   - url: https://beers-api.dmgiangi.dev
     description: fresh backend
+  - url: https://api.punkapi.com/v2
+  description: old backend
 paths:
   /beers/{beer-id}:
     get:
