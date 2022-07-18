@@ -8,7 +8,7 @@ servers:
   - url: https://beers-api.dmgiangi.dev
     description: fresh backend
   - url: https://api.punkapi.com/v2
-  description: old backend
+    description: old backend
 paths:
   /beers/{beer-id}:
     get:
