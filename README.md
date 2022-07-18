@@ -21,7 +21,7 @@ the technology used to achieve thi result are:
 - Oracle Linux
 - Apache
 
-## TODO
+## TODO for version 1.1
 there is a lot todo:
 - ✅ define CORS
 - ✅ limit access rate

@@ -1,6 +1,6 @@
 package com.github.dmgiangi.brewerhub.dao;
 
-import com.github.dmgiangi.brewerhub.exceptions.InsertException;
+import com.github.dmgiangi.brewerhub.models.exceptions.InsertException;
 import com.github.dmgiangi.brewerhub.models.entity.MashTemp;
 import com.github.dmgiangi.brewerhub.models.entity.TemperatureUnits;
 import org.apache.logging.log4j.LogManager;

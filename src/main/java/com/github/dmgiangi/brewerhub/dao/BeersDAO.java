@@ -1,6 +1,6 @@
 package com.github.dmgiangi.brewerhub.dao;
 
-import com.github.dmgiangi.brewerhub.exceptions.InsertException;
+import com.github.dmgiangi.brewerhub.models.exceptions.InsertException;
 import com.github.dmgiangi.brewerhub.models.proto_orm.JdbcBooleanOperator;
 import com.github.dmgiangi.brewerhub.models.proto_orm.JdbcConditionBuilder;
 import com.github.dmgiangi.brewerhub.models.entity.*;

@@ -1,4 +1,4 @@
-package com.github.dmgiangi.brewerhub.utilities;
+package com.github.dmgiangi.brewerhub.services;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

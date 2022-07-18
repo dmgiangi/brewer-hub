@@ -1,4 +1,4 @@
-package com.github.dmgiangi.brewerhub.exceptions;
+package com.github.dmgiangi.brewerhub.models.exceptions;
 
 import lombok.Getter;
 

@@ -2,7 +2,7 @@ package com.github.dmgiangi.brewerhub.controllers;
 
 import com.github.dmgiangi.brewerhub.dao.BeersDAO;
 import com.github.dmgiangi.brewerhub.models.entity.BeersList;
-import com.github.dmgiangi.brewerhub.utilities.SqlConnectionFactory;
+import com.github.dmgiangi.brewerhub.services.SqlConnectionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
