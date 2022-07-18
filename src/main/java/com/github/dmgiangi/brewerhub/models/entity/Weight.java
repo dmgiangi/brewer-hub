@@ -2,7 +2,6 @@ package com.github.dmgiangi.brewerhub.models.entity;
 
 import com.github.dmgiangi.brewerhub.utilities.Indent;
 import com.google.gson.annotations.SerializedName;
-
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.experimental.Accessors;

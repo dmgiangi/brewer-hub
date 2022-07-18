@@ -1,6 +1,5 @@
 package com.github.dmgiangi.brewerhub.models;
 
-import com.github.dmgiangi.brewerhub.models.entity.WeightUnits;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

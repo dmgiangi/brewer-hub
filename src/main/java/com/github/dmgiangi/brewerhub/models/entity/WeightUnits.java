@@ -1,8 +1,5 @@
 package com.github.dmgiangi.brewerhub.models.entity;
 
-import java.io.IOException;
-import java.util.Map;
-
 import com.google.gson.TypeAdapter;
 import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.stream.JsonReader;
@@ -11,6 +8,9 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
+
+import java.io.IOException;
+import java.util.Map;
 
 // TODO write javadoc for thi class
 @ToString
