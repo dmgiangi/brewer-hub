@@ -1,6 +1,6 @@
 package com.github.dmgiangi.brewerhub.services;
 
-import com.github.dmgiangi.brewerhub.models.response.Error;
+import com.github.dmgiangi.brewerhub.models.entity.ErrorResponse;
 import com.google.gson.Gson;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
@@ -22,7 +22,7 @@ import java.util.Map;
 public class IpFilter implements Filter {
         final static Logger logger = LogManager.getLogger(IpFilter.class);
 
-        private static final Bandwidth limit = Bandwidth.simple(60, Duration.ofMinutes(1));
+        private static final Bandwidth limit = Bandwidth.simple(3, Duration.ofMinutes(1));
 
         private Map<String, Bucket> buckets;
 
@@ -54,14 +54,12 @@ public class IpFilter implements Filter {
                                 bucket.getAvailableTokens() + "");
                         chain.doFilter(request, httpResponse);
                 } else {
-                        // limit is exceeded
-
                         httpResponse.setContentType(MediaType.APPLICATION_JSON_VALUE);
                         httpResponse.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
                         httpResponse.setHeader("x-ratelimit-limit-remaining:", "0");
                         httpResponse.getWriter().write(
                                 new Gson().toJson(
-                                        new Error("Too many request" , "429")));
+                                        new ErrorResponse("Too many request baby! slow down!" , "429")));
                         httpResponse.getWriter().flush();
                 }
         }
