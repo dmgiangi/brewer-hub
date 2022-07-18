@@ -1,11 +1,10 @@
 package com.github.dmgiangi.brewerhub.services;
 
+import com.github.dmgiangi.brewerhub.models.exceptions.ConnectionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -28,8 +27,8 @@ public class SqlConnectionFactory
     private String databaseName;
     private String port;
 
-    public Connection getConnection(){
-        Connection connection = null;
+    public Connection getConnection() throws ConnectionException{
+        Connection connection;
 
         type = propertyLoader.getType();
         databaseName = propertyLoader.getName();
@@ -39,25 +38,21 @@ public class SqlConnectionFactory
             host = propertyLoader.getHost();
             String username = propertyLoader.getUsername();
             String password = propertyLoader.getPassword();
-
+            logger.debug("Connecting ... " + getConnInfo());
             try
             {
-                logger.debug("Connecting ... " + getConnInfo());
                 Class.forName("org.mariadb.jdbc.Driver");
-                connection = DriverManager.getConnection(getConnInfo(), username, password);
             } catch (ClassNotFoundException e) {
                 logger.error(e.getMessage());
+                throw new ConnectionException("Unable to find jdbc driver", e);
             }
+            connection = DriverManager.getConnection(getConnInfo(), username, password);
         } catch (SQLException e) {
-            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Unable to connect to the database.");
+            logger.error(e.getMessage());
+            throw new ConnectionException("Unable to connect to the database", e);
         }
-
-        if (connection != null) {
-            logger.debug("Connection Established -> " + connection);
-        } else {
-            logger.error("Connection fail.");
-            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Unable to connect to the database.");
-        }
+        if(connection == null)
+            throw new ConnectionException("Connection is null");
         return connection;
     }
 
@@ -68,6 +63,7 @@ public class SqlConnectionFactory
             connection.close();
         } catch (SQLException e) {
             logger.error(e.getMessage());
+            throw new ConnectionException(e.getMessage(), e);
         }
     }
 

@@ -66,13 +66,7 @@ public class BeersController {
         );
         connectionFactory.disconnect(connection);
 
-        HttpHeaders headers = new HttpHeaders();
-        response.getHeaderNames()
-                .forEach(header ->
-                        headers.add(header, response.getHeader(header)));
-
         return ResponseEntity.ok()
-                .headers(headers)
                 .body(resultPage);
     }
 
