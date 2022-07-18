@@ -13,7 +13,6 @@ import java.util.Properties;
 
 @Getter
 @Configuration
-@PropertySource("database.properties")
 public class DatabasePropertyLoader extends Properties{
     final static Logger logger = LoggerFactory.getLogger(DatabasePropertyLoader.class);
 
