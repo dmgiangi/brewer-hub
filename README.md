@@ -24,7 +24,8 @@ the technology used to achieve thi result are:
 ## TODO
 there is a lot todo:
 - ✅ define CORS
-- ❌ limit access rate
+- ✅ limit access rate
 - ✅ attach response header
 - ❌ handle exception errors in responses
 - ✅ handle http errors
+- ✅ make a bean SqlConnectionFactory

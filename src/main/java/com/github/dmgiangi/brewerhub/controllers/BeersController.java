@@ -3,6 +3,7 @@ package com.github.dmgiangi.brewerhub.controllers;
 import com.github.dmgiangi.brewerhub.dao.BeersDAO;
 import com.github.dmgiangi.brewerhub.models.entity.BeersList;
 import com.github.dmgiangi.brewerhub.utilities.SqlConnectionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -12,11 +13,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
+import java.sql.Connection;
 
 @RestController
 @CrossOrigin
 public class BeersController {
-
     @GetMapping(path = "/beers", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<BeersList> findPaginated(
             HttpServletResponse response,
@@ -41,13 +42,11 @@ public class BeersController {
         if(page < 1) page = 1;
         if(per_page < 1 || per_page > 80) per_page = 80;
 
-        SqlConnectionFactory connectionFactory;
-        connectionFactory = new SqlConnectionFactory();
-        connectionFactory.createConnection();
+        Connection connection = connectionFactory.getConnection();
 
         BeersList resultPage;
 
-        resultPage = new BeersDAO(connectionFactory.getConnection()).selectBeersList(
+        resultPage = new BeersDAO(connection).selectBeersList(
                 page,
                 per_page,
                 abv_gt,
@@ -65,7 +64,7 @@ public class BeersController {
                 food == null ? null : food.trim().replace('_', ' '),
                 ids
         );
-        connectionFactory.disconnect();
+        connectionFactory.disconnect(connection);
 
         HttpHeaders headers = new HttpHeaders();
         response.getHeaderNames()
@@ -76,5 +75,12 @@ public class BeersController {
                 .headers(headers)
                 .body(resultPage);
     }
+
+    public BeersController(SqlConnectionFactory connectionFactory) {
+        this.connectionFactory = connectionFactory;
+    }
+
+    @Autowired
+    private final SqlConnectionFactory connectionFactory;
 }
 
