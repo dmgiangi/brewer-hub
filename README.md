@@ -1,6 +1,10 @@
 # brewer-hub
 Backend project that allow to get information about beers trough public API
 
+## Credits
+this repo is a porting of [punkapi-server](https://github.com/sammdec/punkapi-server) of [sammdec](https://github.com/sammdec) in java Spring.\
+Other credit are available in the [CREDITS.md](https://github.com/dmgiangi/brewer-hub/blob/master/CREDITS.md) file
+
 ## Documentation
 the documentation of the API can be found [here](https://dmgiangi.github.io/brewer-hub/).
 
@@ -15,17 +19,16 @@ Complete documentation about the API is avaiable in the link above.
 ## technology stack
 the technology used to achieve thi result are:
 - Git and GitHub
+- Maven
 - Java with Spring Framework
 - Oracle Cloud Service
-- MariaDB
 - Oracle Linux
+- MariaDB
 - Apache
+Dependency of the project:
+- Gson [De]Serialization library
+- bucket4j Java rate limiting library
+- Log4j Log framework
+- thymeleaf Java template engine
+- Lombok code generation library
 
-## TODO for version 1.1
-there is a lot todo:
-- ✅ define CORS
-- ✅ limit access rate
-- ✅ attach response header
-- ❌ handle exception errors in responses
-- ✅ handle http errors
-- ✅ make a bean SqlConnectionFactory
