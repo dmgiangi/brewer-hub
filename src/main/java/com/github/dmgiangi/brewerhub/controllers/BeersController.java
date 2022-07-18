@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @RestController
@@ -20,7 +19,6 @@ public class BeersController {
 
     @GetMapping(path = "/beers", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<BeersList> findPaginated(
-            HttpServletRequest request,
             HttpServletResponse response,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "80") int per_page,
@@ -38,6 +36,7 @@ public class BeersController {
             @RequestParam(required = false) String malt,
             @RequestParam(required = false) String food,
             @RequestParam(required = false) String ids) {
+
 
         if(page < 1) page = 1;
         if(per_page < 1 || per_page > 80) per_page = 80;
@@ -69,7 +68,9 @@ public class BeersController {
         connectionFactory.disconnect();
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add("1", "uno");
+        response.getHeaderNames()
+                .forEach(header ->
+                        headers.add(header, response.getHeader(header)));
 
         return ResponseEntity.ok()
                 .headers(headers)
