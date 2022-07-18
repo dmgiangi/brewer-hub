@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Sorry, something gone wrong!</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+    </style>
+</head>
+
+<body>
+
+
+<div style="position: absolute;
+    width: 300px;
+    height: 300px;
+    z-index: 15;
+    top: 50%;
+    left: 50%;
+    margin: -300px 0 0 -150px;
+    text-align: center;
+    font-family: 'Roboto', sans-serif;">
+    <h1>Sorry, Failed to process your request</h1>
+    <img th:src="@{/images/empty-mug.svg}" height="200" width="200" style="margin-left: 40px;"/>
+    <div style="display: block; color: red; height: 30;">&nbsp;</div>
+    <div>
+        <span><strong>Status: </strong></span>
+        <span th:text="${status}"></span>
+    </div>
+    <div>
+        <span><strong>Error: </strong></span>
+        <span th:text="${error}"></span>
+    </div>
+    <div th:if="${message != null}">
+        <span><strong>Message: </strong></span>
+        <span th:text="${message}"></span>
+    </div>
+</div>
+</body>
+</html>

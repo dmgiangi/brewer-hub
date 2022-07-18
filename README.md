@@ -23,7 +23,7 @@ the technology used to achieve thi result are:
 
 ## TODO
 there is a lot todo:
-- define CORS
-- limit access rate
-- attach response header
-- handle errors response
+- :heavy_check_mark: define CORS
+- :white_check_mark: limit access rate
+- :white_check_mark: attach response header
+- :white_check_mark: handle errors response
