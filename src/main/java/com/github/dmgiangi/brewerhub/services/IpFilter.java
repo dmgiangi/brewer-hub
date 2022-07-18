@@ -22,7 +22,7 @@ import java.util.Map;
 public class IpFilter implements Filter {
         final static Logger logger = LogManager.getLogger(IpFilter.class);
 
-        private static final Bandwidth limit = Bandwidth.simple(3, Duration.ofMinutes(1));
+        private static final Bandwidth limit = Bandwidth.simple(50, Duration.ofMinutes(1));
 
         private Map<String, Bucket> buckets;
 
