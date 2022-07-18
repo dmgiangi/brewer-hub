@@ -1,4 +1,4 @@
-package com.github.dmgiangi.brewerhub.models;
+package com.github.dmgiangi.brewerhub.models.proto_orm;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

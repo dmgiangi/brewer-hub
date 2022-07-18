@@ -1,8 +1,8 @@
 package com.github.dmgiangi.brewerhub.dao;
 
 import com.github.dmgiangi.brewerhub.exceptions.InsertException;
-import com.github.dmgiangi.brewerhub.models.JdbcBooleanOperator;
-import com.github.dmgiangi.brewerhub.models.JdbcConditionBuilder;
+import com.github.dmgiangi.brewerhub.models.proto_orm.JdbcBooleanOperator;
+import com.github.dmgiangi.brewerhub.models.proto_orm.JdbcConditionBuilder;
 import com.github.dmgiangi.brewerhub.models.entity.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

@@ -1,4 +1,4 @@
-package com.github.dmgiangi.brewerhub.models;
+package com.github.dmgiangi.brewerhub.models.proto_orm;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
