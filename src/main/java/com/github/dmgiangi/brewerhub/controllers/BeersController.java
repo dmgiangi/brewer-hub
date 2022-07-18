@@ -4,9 +4,9 @@ import com.github.dmgiangi.brewerhub.dao.BeersDAO;
 import com.github.dmgiangi.brewerhub.models.entity.BeersList;
 import com.github.dmgiangi.brewerhub.utilities.SqlConnectionFactory;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,10 +15,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @RestController
+@CrossOrigin
 public class BeersController {
 
-    @GetMapping(path = "/beers",
-            produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = "/beers", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<BeersList> findPaginated(
             HttpServletRequest request,
             HttpServletResponse response,
@@ -67,7 +67,13 @@ public class BeersController {
                 ids
         );
         connectionFactory.disconnect();
-        return new ResponseEntity<>(resultPage, new HttpHeaders(), HttpStatus.OK);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("1", "uno");
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(resultPage);
     }
 }
 

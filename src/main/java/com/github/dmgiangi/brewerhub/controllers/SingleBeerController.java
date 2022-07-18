@@ -3,27 +3,29 @@ package com.github.dmgiangi.brewerhub.controllers;
 import com.github.dmgiangi.brewerhub.dao.BeersDAO;
 import com.github.dmgiangi.brewerhub.models.entity.Beer;
 import com.github.dmgiangi.brewerhub.utilities.SqlConnectionFactory;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.Duration;
+import java.util.concurrent.RejectedExecutionException;
 
 @RestController
-@RequestMapping("/beers")
+@CrossOrigin
 public class SingleBeerController {
-   @GetMapping("/{id}")
-   public Beer getBeer(@PathVariable int id){
+   @GetMapping(path = "/beers/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+   public ResponseEntity<Beer> getBeer(@PathVariable int id){
+
       SqlConnectionFactory connectionFactory = new SqlConnectionFactory();
       Beer beer = new BeersDAO(connectionFactory.getConnection()).getBeerById(id);
       connectionFactory.disconnect();
-      return beer;
-   }
 
-   @GetMapping("/random")
-   public Beer getRandomBeer(){
-      SqlConnectionFactory connectionFactory = new SqlConnectionFactory();
-      Beer beer = new BeersDAO(connectionFactory.getConnection()).selectRandomBeer();
-      connectionFactory.disconnect();
-      return beer;
+      HttpHeaders headers = new HttpHeaders();
+      headers.add("1", "uno");
+
+      return ResponseEntity.ok()
+              .headers(headers)
+              .body(beer);
    }
 }
