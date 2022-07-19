@@ -27,8 +27,5 @@ public class RandomBeerController {
     }
 
     @Autowired
-    private final SqlConnectionFactory connectionFactory;
-    public RandomBeerController(SqlConnectionFactory connectionFactory) {
-        this.connectionFactory = connectionFactory;
-    }
+    private SqlConnectionFactory connectionFactory;
 }

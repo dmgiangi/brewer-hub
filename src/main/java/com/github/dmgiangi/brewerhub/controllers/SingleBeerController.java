@@ -27,10 +27,6 @@ public class SingleBeerController {
               .body(beer);
    }
 
-   public SingleBeerController(SqlConnectionFactory connectionFactory) {
-      this.connectionFactory = connectionFactory;
-   }
-
    @Autowired
-   private final SqlConnectionFactory connectionFactory;
+   private SqlConnectionFactory connectionFactory;
 }

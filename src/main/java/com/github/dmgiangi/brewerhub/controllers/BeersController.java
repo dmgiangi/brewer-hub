@@ -69,11 +69,7 @@ public class BeersController {
                 .body(resultPage);
     }
 
-    public BeersController(SqlConnectionFactory connectionFactory) {
-        this.connectionFactory = connectionFactory;
-    }
-
     @Autowired
-    private final SqlConnectionFactory connectionFactory;
+    private SqlConnectionFactory connectionFactory;
 }
 
