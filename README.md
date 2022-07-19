@@ -7,9 +7,8 @@ Other credit are available in the [CREDITS.md](https://github.com/dmgiangi/brewe
 
 ## Documentation
 the documentation of the API can be found [here](https://dmgiangi.github.io/brewer-hub/).
-
-## Endpoint
-There is 3 endpoint available:
+### Example
+There are 3 endpoint available:
 - [https://beers-api.dmgiangi.dev/beers](https://beers-api.dmgiangi.dev/beers)
 - [https://beers-api.dmgiangi.dev/beers/{beer-id}](https://beers-api.dmgiangi.dev/beers/1)
 - [https://beers-api.dmgiangi.dev/beers/random](https://beers-api.dmgiangi.dev/beers/random)
@@ -24,11 +23,15 @@ the technology used to achieve thi result are:
 - Oracle Cloud Service
 - Oracle Linux
 - MariaDB
-- Apache
+- Apache\
+
 Dependency of the project:
 - Gson [De]Serialization library
 - bucket4j Java rate limiting library
 - Log4j Log framework
 - thymeleaf Java template engine
 - Lombok code generation library
+
+## TODO
+- create documentation
 
