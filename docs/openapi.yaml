@@ -412,7 +412,7 @@ components:
         type: integer
         format: int32
         default: 1
-        example: 2
+        example: 1
         minimum: 1
     per_page:
       name: per_page
@@ -434,7 +434,7 @@ components:
       schema:
         type: number
         format: float
-        example:  4.1
+        example:  2.0
     abv_lt:
       name: abv_lt
       in: query
@@ -443,7 +443,7 @@ components:
       schema:
         type: number
         format: float
-        example:  4.1
+        example:  13.1
     ibu_gt:
       name: ibu_gt
       in: query
@@ -452,7 +452,7 @@ components:
       schema:
         type: number
         format: float
-        example:  41.4
+        example:  20.1
     ibu_lt:
       name: ibu_lt
       in: query
@@ -461,7 +461,7 @@ components:
       schema:
         type: number
         format: float
-        example:  41.5
+        example:  80.3
     ebc_gt:
       name: ebc_gt
       in: query
@@ -470,7 +470,7 @@ components:
       schema:
         type: number
         format: float
-        example:  15
+        example:  20.3
     ebc_lt:
       name: ebc_lt
       in: query
@@ -479,7 +479,7 @@ components:
       schema:
         type: number
         format: float
-        example:  15
+        example:  80
     beer_name:
       name: beer_name
       in: query
@@ -487,7 +487,7 @@ components:
       required: false
       schema:
         type: string
-        example: "punk_ipa"
+        example: "al"
     yeast:
       name: yeast
       in: query
@@ -506,7 +506,7 @@ components:
         maxLength: 7
         minLength: 7
         pattern: '[0-1][0-9]\/[1-2][0-9]{3}'
-        example: "09/2007"
+        example: "09/2021"
     brewed_after:
       name: brewed_after
       in: query
@@ -517,7 +517,7 @@ components:
         maxLength: 7
         minLength: 7
         pattern: '[0-1][0-9]\/[1-2][0-9]{3}'
-        example: "09/2007"
+        example: "09/2013"
     hops:
       name: hops
       in: query
@@ -526,7 +526,7 @@ components:
       required: false
       schema:
         type: string
-        example: "Fuggles"
+        example: "Amar"
     malt:
       name: malt
       in: query
@@ -535,7 +535,7 @@ components:
       required: false
       schema:
         type: string
-        example: "Maris Otter Extra Pale"
+        example: "Ale"
     food:
       name: food
       in: query
@@ -544,7 +544,7 @@ components:
       required: false
       schema:
         type: string
-        example: "Spicy chicken tikka masala"
+        example: "Cheese"
     ids:
       name: ids
       in: query
@@ -553,4 +553,4 @@ components:
       required: false
       schema:
         type: string
-        example: "2|56|93"
+        example: "14|108|122"

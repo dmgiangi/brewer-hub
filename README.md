@@ -23,7 +23,7 @@ the technology used to achieve thi result are:
 - Oracle Cloud Service
 - Oracle Linux
 - MariaDB
-- Apache\
+- Apache
 
 Dependency of the project:
 - Gson [De]Serialization library
