@@ -4,7 +4,6 @@ import com.github.dmgiangi.brewerhub.dao.BeersDAO;
 import com.github.dmgiangi.brewerhub.models.entity.BeersList;
 import com.github.dmgiangi.brewerhub.services.SqlConnectionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
