@@ -95,7 +95,7 @@ public class BeersDAO {
                     brewed_before,
                     "MM-yyyy")
                 .addCondition(
-                        "EXISTS ( SELECT FROM yeasts y " +
+                        "EXISTS ( SELECT * FROM yeasts y " +
                         "WHERE y.id = b.yeast_id AND y.name LIKE '%?%')", yeast)
                 .addCondition(
                         "EXISTS ( " +
