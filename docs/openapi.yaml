@@ -51,6 +51,24 @@ paths:
                 $ref: "#/components/schemas/beer"
         "404":
           $ref: "#/components/responses/not-found"
+  /beers-name:
+    get:
+      description: "get list of beers name and id"
+      responses:
+        "200":
+          description: |
+            response with a json with the information about the name and the id of all the beers in DB.
+          headers:
+            x-ratelimit-limit:
+              $ref: "#/components/headers/x-ratelimit-limit"
+            x-ratelimit-limit-remaining:
+              $ref: "#/components/headers/x-ratelimit-limit-remaining"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/beer-name-list"
+        "404":
+          $ref: "#/components/responses/not-found"
   /beers:
     get:
       description: "return information about all the beers"
@@ -105,6 +123,7 @@ components:
           format: int32
           example: 1
           nullable: false
+          readOnly: true
         name:
           type: string
           maxLength: 100
@@ -202,15 +221,15 @@ components:
             $ref: "#/components/schemas/malt"
       example:
         - name: Maris Otter Extra Pale
-          amount: 
+          amount:
             value: 3.3
             unit: "kilograms"
         - name: Caramalt
-          amount: 
+          amount:
             value: 0.2
             unit: "kilograms"
         - name: Munich
-          amount: 
+          amount:
             value: 0.4
             unit: "kilograms"
     malt:
@@ -228,19 +247,19 @@ components:
         $ref: "#/components/schemas/hop"
       example:
         - name: "Fuggles"
-          amount: 
+          amount:
             value: 25
             unit: "grams"
           add: "start"
           attribute: "Flavour"
         - name: "Fuggles"
-          amount: 
+          amount:
             value: 37.5
             unit: "grams"
           add: "middle"
           attribute: "Flavour"
         - name: "First Gold"
-          amount: 
+          amount:
             value: 37.5
             unit: "grams"
           add: "end"
@@ -357,7 +376,21 @@ components:
         - "kelvin"
       description: ""
       example: celsius
-
+    beer-name-list:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            format: int32
+            example: 1
+            nullable: false
+          name:
+            type: string
+            maxLength: 100
+            example: "Buzz"
+            nullable: false
     beers-list:
       type: array
       items:
