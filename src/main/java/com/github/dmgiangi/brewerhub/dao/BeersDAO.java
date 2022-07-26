@@ -7,7 +7,9 @@ import com.github.dmgiangi.brewerhub.models.entity.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.List;
 import java.sql.*;
+import java.util.ArrayList;
 
 public class BeersDAO {
     final static Logger logger = LogManager.getLogger(BeersDAO.class);
@@ -328,5 +330,32 @@ public class BeersDAO {
                 : beersList.isEmpty()
                 ? null
                 : beersList.get(0);
+    }
+
+    private static final String getBeerName = "SELECT id, name FROM beers;";
+    public List<BeerReference> getBeerName() {
+        List<BeerReference> beersNameList= new ArrayList<>();
+
+        try (PreparedStatement statement = connection.prepareStatement(getBeerName)) {
+            if (statement.execute()) {
+                ResultSet resultSet = statement.getResultSet();
+                try {
+                    while(resultSet.next()) {
+                        if (resultSet.getInt("id") != 0){
+                            beersNameList.add(
+                                    new BeerReference().setId(resultSet.getInt("id"))
+                                            .setName(resultSet.getString("name"))
+                            );
+                        }
+                    }
+                } catch (SQLException e) {
+                    logger.error(e.getMessage());
+                }
+            }
+        } catch (SQLException e) {
+            logger.error(e.getMessage());
+        }
+
+        return beersNameList;
     }
 }

@@ -1,6 +1,7 @@
 package com.github.dmgiangi.brewerhub.controllers;
 
 import com.github.dmgiangi.brewerhub.dao.BeersDAO;
+import com.github.dmgiangi.brewerhub.models.entity.BeerReference;
 import com.github.dmgiangi.brewerhub.models.entity.BeersList;
 import com.github.dmgiangi.brewerhub.services.SqlConnectionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,13 +14,26 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
 import java.sql.Connection;
+import java.util.List;
 
 @RestController
 @CrossOrigin
 public class BeersController {
+
+    @GetMapping(path = "/beers-name")
+    public ResponseEntity<List<BeerReference>> getBeersName(){
+        Connection connection = connectionFactory.getConnection();
+        List<BeerReference> resultPage;
+
+        resultPage = new BeersDAO(connection).getBeerName();
+
+        connectionFactory.disconnect(connection);
+        return ResponseEntity.ok()
+                .body(resultPage);
+    }
+
     @GetMapping(path = "/beers", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<BeersList> findPaginated(
-            HttpServletResponse response,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "80") int per_page,
             @RequestParam(required = false) Float abv_gt,
